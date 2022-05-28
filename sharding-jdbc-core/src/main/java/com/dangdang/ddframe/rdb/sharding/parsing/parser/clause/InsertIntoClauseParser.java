@@ -25,17 +25,17 @@ public class InsertIntoClauseParser implements SQLClauseParser {
      * @param insertStatement insert statement
      */
     public void parse(final InsertStatement insertStatement) {
-        lexerEngine.unsupportedIfEqual(getUnsupportedKeywordsBeforeInto());
+        lexerEngine.unsupportedIfEqual(getUnsupportedKeywordsBeforeInto());  // 例如，Oracle，INSERT FIRST/ALL 目前不支持
         lexerEngine.skipUntil(DefaultKeyword.INTO);
         lexerEngine.nextToken();
-        tableReferencesClauseParser.parse(insertStatement, true);
-        skipBetweenTableAndValues(insertStatement);
+        tableReferencesClauseParser.parse(insertStatement, true); // 解析表
+        skipBetweenTableAndValues(insertStatement); // 跳过 表 和 插入字段 中间的 Token
     }
     
     protected Keyword[] getUnsupportedKeywordsBeforeInto() {
         return new Keyword[0];
     }
-    
+    // 跳过 表 和 插入字段 中间的 Token。例如 MySQL ：[PARTITION (partition_name,...)]
     private void skipBetweenTableAndValues(final InsertStatement insertStatement) {
         while (lexerEngine.skipIfEqual(getSkippedKeywordsBetweenTableAndValues())) {
             lexerEngine.nextToken();

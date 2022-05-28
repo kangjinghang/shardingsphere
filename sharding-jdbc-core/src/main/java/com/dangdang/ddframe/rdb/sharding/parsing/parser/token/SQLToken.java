@@ -18,7 +18,7 @@
 package com.dangdang.ddframe.rdb.sharding.parsing.parser.token;
 
 /**
- * SQL Token.
+ * SQL Token. SQL标记对象接口，SQL 改写时使用到
  *
  * @author zhangliang
  */

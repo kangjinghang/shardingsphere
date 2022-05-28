@@ -15,7 +15,7 @@ public class OracleDistinctClauseParser extends DistinctClauseParser {
     public OracleDistinctClauseParser(final LexerEngine lexerEngine) {
         super(lexerEngine);
     }
-    
+    // ORACLE 加入 UNIQUE 关键字
     @Override
     protected Keyword[] getSynonymousKeywordsForDistinct() {
         return new Keyword[] {DefaultKeyword.UNIQUE};

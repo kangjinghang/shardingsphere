@@ -28,11 +28,11 @@ package com.dangdang.ddframe.rdb.sharding.executor;
 public interface ExecuteCallback<T> {
     
     /**
-     * Execute task.
+     * Execute task. 执行任务
      * 
-     * @param baseStatementUnit statement execute unit
-     * @return execute result
-     * @throws Exception execute exception
+     * @param baseStatementUnit statement execute unit 语句对象执行单元
+     * @return execute result 处理结果
+     * @throws Exception execute exception 执行期异常
      */
     T execute(BaseStatementUnit baseStatementUnit) throws Exception;
 }

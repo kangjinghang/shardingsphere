@@ -41,7 +41,7 @@ public final class MySQLLimitClauseParser implements SQLClauseParser {
     private final LexerEngine lexerEngine;
     
     /**
-     * Parse limit.
+     * Parse limit. 分为3种情况： 1. LIMIT row_count 2. LIMIT offset, row_count 3. LIMIT row_count OFFSET offset
      * 
      * @param selectStatement select statement
      */

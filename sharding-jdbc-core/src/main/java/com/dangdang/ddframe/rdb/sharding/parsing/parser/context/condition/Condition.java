@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 /**
- * Condition.
+ * Condition. 条件对象，属于分片上下文信息。在插入SQL解析里存储影响分片的值字段
  *
  * @author zhangliang
  */
@@ -30,7 +30,7 @@ import java.util.Map.Entry;
 @EqualsAndHashCode
 @ToString
 public final class Condition {
-    
+    // 字段
     @Getter
     private final Column column;
     

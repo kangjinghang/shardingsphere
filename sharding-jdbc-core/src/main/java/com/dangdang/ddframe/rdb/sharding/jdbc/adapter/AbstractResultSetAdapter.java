@@ -32,13 +32,13 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Adapter for {@code ResultSet}.
+ * Adapter for {@code ResultSet}. 代理结果集适配器
  * 
  * @author zhangliang
  */
 @Slf4j
 public abstract class AbstractResultSetAdapter extends AbstractUnsupportedOperationResultSet {
-    
+    // 结果集集合
     @Getter
     private final List<ResultSet> resultSets;
 

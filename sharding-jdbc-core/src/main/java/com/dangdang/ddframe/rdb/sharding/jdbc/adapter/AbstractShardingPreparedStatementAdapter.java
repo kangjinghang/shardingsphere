@@ -41,14 +41,14 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Sharding adapter for {@code PreparedStatement}.
+ * Sharding adapter for {@code PreparedStatement}. 预编译语句对象的适配类
  *
  * @author zhangliang
  */
 public abstract class AbstractShardingPreparedStatementAdapter extends AbstractUnsupportedOperationPreparedStatement {
-    
+    // 记录的设置参数方法数组
     private final List<SetParameterMethodInvocation> setParameterMethodInvocations = new LinkedList<>();
-    
+    // 参数
     @Getter
     private final List<Object> parameters = new ArrayList<>();
     
@@ -285,18 +285,18 @@ public abstract class AbstractShardingPreparedStatementAdapter extends AbstractU
         setParameter(parameterIndex, x);
         recordSetParameter("setObject", new Class[]{int.class, Object.class, int.class, int.class}, parameterIndex, x, targetSqlType, scaleOrLength);
     }
-    
+    // 记录占位符参数
     private void setParameter(final int parameterIndex, final Object value) {
         if (parameters.size() == parameterIndex - 1) {
             parameters.add(value);
             return;
         }
-        for (int i = parameters.size(); i <= parameterIndex - 1; i++) {
+        for (int i = parameters.size(); i <= parameterIndex - 1; i++) {  // 用 null 填充前面未设置的位置
             parameters.add(null);
         }
         parameters.set(parameterIndex - 1, value);
     }
-    
+    // 记录设置参数方法调用
     private void recordSetParameter(final String methodName, final Class[] argumentTypes, final Object... arguments) {
         try {
             setParameterMethodInvocations.add(new SetParameterMethodInvocation(PreparedStatement.class.getMethod(methodName, argumentTypes), arguments, arguments[1]));
@@ -312,7 +312,7 @@ public abstract class AbstractShardingPreparedStatementAdapter extends AbstractU
             throw new ShardingJdbcException(ex);
         }
     }
-    
+    //  回放记录的设置参数方法调用
     protected void replaySetParameter(final PreparedStatement preparedStatement) {
         addParameters();
         for (SetParameterMethodInvocation each : setParameterMethodInvocations) {
@@ -320,7 +320,7 @@ public abstract class AbstractShardingPreparedStatementAdapter extends AbstractU
             each.invoke(preparedStatement);
         }
     }
-    
+    //  当使用分布式主键时，生成后会添加到 parameters，此时 parameters 数量多于 setParameterMethodInvocations，需要生成该分布式主键的 SetParameterMethodInvocation
     private void addParameters() {
         for (int i = setParameterMethodInvocations.size(); i < parameters.size(); i++) {
             recordSetParameter("setObject", new Class[]{int.class, Object.class}, i + 1, parameters.get(i));
@@ -329,7 +329,7 @@ public abstract class AbstractShardingPreparedStatementAdapter extends AbstractU
     
     private void updateParameterValues(final SetParameterMethodInvocation setParameterMethodInvocation, final Object value) {
         if (!Objects.equals(setParameterMethodInvocation.getValue(), value)) {
-            setParameterMethodInvocation.changeValueArgument(value);
+            setParameterMethodInvocation.changeValueArgument(value);  // 修改占位符参数
         }
     }
     

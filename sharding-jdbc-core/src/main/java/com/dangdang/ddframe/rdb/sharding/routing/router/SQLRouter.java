@@ -23,14 +23,14 @@ import com.dangdang.ddframe.rdb.sharding.routing.SQLRouteResult;
 import java.util.List;
 
 /**
- * SQL router interface.
+ * SQL router interface. SQL 路由器接口，共有两种实现
  * 
  * @author zhangiang
  */
 public interface SQLRouter {
     
     /**
-     * Parse SQL.
+     * Parse SQL. 进行SQL解析
      * 
      * @param logicSQL logic SQL
      * @param parametersSize parameters size
@@ -39,7 +39,7 @@ public interface SQLRouter {
     SQLStatement parse(String logicSQL, int parametersSize);
     
     /**
-     * Route SQL.
+     * Route SQL. 进行SQL路由
      * 
      * @param logicSQL logic SQL
      * @param sqlStatement SQL statement

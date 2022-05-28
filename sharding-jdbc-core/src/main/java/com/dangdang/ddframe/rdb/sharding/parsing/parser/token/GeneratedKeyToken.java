@@ -21,13 +21,13 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
- * Generated key token.
+ * Generated key token. 自增主键标记对象
  *
  * @author zhangliang
  */
 @RequiredArgsConstructor
 @Getter
 public final class GeneratedKeyToken implements SQLToken {
-    
+    // 开始位置
     private final int beginPosition;
 }

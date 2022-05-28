@@ -18,7 +18,7 @@
 package com.dangdang.ddframe.rdb.sharding.routing.strategy;
 
 /**
- * Sharding algorithm interface.
+ * Sharding algorithm interface. 分片算法
  * 
  * @author zhangliang
  */

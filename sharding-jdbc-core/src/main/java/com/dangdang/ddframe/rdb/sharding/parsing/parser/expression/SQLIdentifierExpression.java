@@ -21,7 +21,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
- * Identifier expression.
+ * Identifier expression. 标识表达式。对应Token：Literals.IDENTIFIER
  *
  * @author zhangliang
  */

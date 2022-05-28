@@ -21,7 +21,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
- * Ignored expression when SQL parsing.
+ * Ignored expression when SQL parsing. 分片中无需关注的SQL表达式
  *
  * @author zhangliang
  */

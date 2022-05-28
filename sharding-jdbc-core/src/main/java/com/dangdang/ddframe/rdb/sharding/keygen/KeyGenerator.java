@@ -18,7 +18,7 @@
 package com.dangdang.ddframe.rdb.sharding.keygen;
 
 /**
- * Key generator interface.
+ * Key generator interface. 主键生成器接口。实现类通过实现 #generateKey() 方法对外提供生成主键的功能。
  *
  * @author zhangliang
  */

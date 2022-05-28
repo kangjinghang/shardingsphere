@@ -20,7 +20,7 @@ package com.dangdang.ddframe.rdb.sharding.routing.type;
 import lombok.Getter;
 
 /**
- *  Routing result.
+ * Routing result. 简单路由结果，RoutingEngine 返回路由结果
  * 
  * @author zhangliang
  */

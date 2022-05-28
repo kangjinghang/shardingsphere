@@ -49,7 +49,7 @@ public class ShardingDataSource extends AbstractDataSourceAdapter implements Aut
         super(shardingRule.getDataSourceRule().getDataSources());
         shardingProperties = new ShardingProperties(null == props ? new Properties() : props);
         int executorSize = shardingProperties.getValue(ShardingPropertiesConstant.EXECUTOR_SIZE);
-        executorEngine = new ExecutorEngine(executorSize);
+        executorEngine = new ExecutorEngine(executorSize); // 一个分片数据源( ShardingDataSource ) 独占 一个 SQL执行引擎( ExecutorEngine )
         boolean showSQL = shardingProperties.getValue(ShardingPropertiesConstant.SQL_SHOW);
         shardingContext = new ShardingContext(shardingRule, getDatabaseType(), executorEngine, showSQL);
     }

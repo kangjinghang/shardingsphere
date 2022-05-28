@@ -65,11 +65,11 @@ public abstract class AbstractSelectParser implements SQLParser {
     
     @Override
     public final SelectStatement parse() {
-        SelectStatement result = parseInternal();
+        SelectStatement result = parseInternal(); // parse internal
         if (result.containsSubQuery()) {
             result = result.mergeSubQueryStatement();
         }
-        // TODO move to rewrite
+        // TODO move to rewrite 对表做了分片，在 AVG , GROUP BY , ORDER BY 需要对 SQL 进行一些改写，以达到能在内存里对结果做进一步处理，例如求平均值、分组、排序等。
         appendDerivedColumns(result);
         appendDerivedOrderBy(result);
         return result;
@@ -81,7 +81,7 @@ public abstract class AbstractSelectParser implements SQLParser {
         parseInternal(result);
         return result;
     }
-    
+    // 子类实现
     protected abstract void parseInternal(final SelectStatement selectStatement);
     
     protected final void parseDistinct() {
@@ -91,16 +91,16 @@ public abstract class AbstractSelectParser implements SQLParser {
     protected final void parseSelectList(final SelectStatement selectStatement, final List<SelectItem> items) {
         selectClauseParserFacade.getSelectListClauseParser().parse(selectStatement, items);
     }
-    
+    // 解析表以及表连接关系
     protected final void parseFrom(final SelectStatement selectStatement) {
         lexerEngine.unsupportedIfEqual(DefaultKeyword.INTO);
         if (lexerEngine.skipIfEqual(DefaultKeyword.FROM)) {
             parseTable(selectStatement);
         }
     }
-    
+    // 解析所有表名和表别名
     private void parseTable(final SelectStatement selectStatement) {
-        if (lexerEngine.skipIfEqual(Symbol.LEFT_PAREN)) {
+        if (lexerEngine.skipIfEqual(Symbol.LEFT_PAREN)) {  // 解析子查询
             selectStatement.setSubQueryStatement(parseInternal());
             if (lexerEngine.equalAny(DefaultKeyword.WHERE, Assist.END)) {
                 return;
@@ -131,14 +131,14 @@ public abstract class AbstractSelectParser implements SQLParser {
     
     private void appendDerivedColumns(final SelectStatement selectStatement) {
         ItemsToken itemsToken = new ItemsToken(selectStatement.getSelectListLastPosition());
-        appendAvgDerivedColumns(itemsToken, selectStatement);
-        appendDerivedOrderColumns(itemsToken, selectStatement.getOrderByItems(), ORDER_BY_DERIVED_ALIAS, selectStatement);
-        appendDerivedOrderColumns(itemsToken, selectStatement.getGroupByItems(), GROUP_BY_DERIVED_ALIAS, selectStatement);
+        appendAvgDerivedColumns(itemsToken, selectStatement); // 解决 AVG 查询
+        appendDerivedOrderColumns(itemsToken, selectStatement.getOrderByItems(), ORDER_BY_DERIVED_ALIAS, selectStatement); // 解决 ORDER BY。
+        appendDerivedOrderColumns(itemsToken, selectStatement.getGroupByItems(), GROUP_BY_DERIVED_ALIAS, selectStatement); // 解决 GROUP BY
         if (!itemsToken.getItems().isEmpty()) {
             selectStatement.getSqlTokens().add(itemsToken);
         }
     }
-    
+    // 解决 AVG 查询。针对 AVG 聚合字段，增加推导字段，AVG 改写成 SUM + COUNT 查询，内存计算出 AVG 结果。
     private void appendAvgDerivedColumns(final ItemsToken itemsToken, final SelectStatement selectStatement) {
         int derivedColumnOffset = 0;
         for (SelectItem each : selectStatement.getItems()) {
@@ -146,19 +146,19 @@ public abstract class AbstractSelectParser implements SQLParser {
                 continue;
             }
             AggregationSelectItem avgItem = (AggregationSelectItem) each;
-            String countAlias = String.format(DERIVED_COUNT_ALIAS, derivedColumnOffset);
+            String countAlias = String.format(DERIVED_COUNT_ALIAS, derivedColumnOffset); // COUNT 字段
             AggregationSelectItem countItem = new AggregationSelectItem(AggregationType.COUNT, avgItem.getInnerExpression(), Optional.of(countAlias));
-            String sumAlias = String.format(DERIVED_SUM_ALIAS, derivedColumnOffset);
+            String sumAlias = String.format(DERIVED_SUM_ALIAS, derivedColumnOffset);  // SUM 字段
             AggregationSelectItem sumItem = new AggregationSelectItem(AggregationType.SUM, avgItem.getInnerExpression(), Optional.of(sumAlias));
-            avgItem.getDerivedAggregationSelectItems().add(countItem);
+            avgItem.getDerivedAggregationSelectItems().add(countItem); // AggregationSelectItem 设置
             avgItem.getDerivedAggregationSelectItems().add(sumItem);
-            // TODO replace avg to constant, avoid calculate useless avg
+            // TODO replace avg to constant, avoid calculate useless avg 将AVG列替换成常数，避免数据库再计算无用的AVG函数。ItemsToken
             itemsToken.getItems().add(countItem.getExpression() + " AS " + countAlias + " ");
             itemsToken.getItems().add(sumItem.getExpression() + " AS " + sumAlias + " ");
             derivedColumnOffset++;
         }
     }
-    
+    // 解决 GROUP BY , ORDER BY。针对 GROUP BY 或 ORDER BY 字段，增加推导字段，如果该字段不在查询字段里，需要额外查询该字段，这样才能在内存里 GROUP BY 或 ORDER BY
     private void appendDerivedOrderColumns(final ItemsToken itemsToken, final List<OrderItem> orderItems, final String aliasPattern, final SelectStatement selectStatement) {
         int derivedColumnOffset = 0;
         for (OrderItem each : orderItems) {
@@ -169,13 +169,13 @@ public abstract class AbstractSelectParser implements SQLParser {
             }
         }
     }
-    
+    // 查询字段是否包含排序字段
     private boolean isContainsItem(final OrderItem orderItem, final SelectStatement selectStatement) {
-        if (selectStatement.isContainStar()) {
+        if (selectStatement.isContainStar()) {  // SELECT *
             return true;
         }
         for (SelectItem each : selectStatement.getItems()) {
-            if (-1 != orderItem.getIndex()) {
+            if (-1 != orderItem.getIndex()) { // ORDER BY 使用数字
                 return true;
             }
             if (each.getAlias().isPresent() && orderItem.getAlias().isPresent() && each.getAlias().get().equalsIgnoreCase(orderItem.getAlias().get())) {
@@ -187,7 +187,7 @@ public abstract class AbstractSelectParser implements SQLParser {
         }
         return false;
     }
-    
+    // 当无 Order By 条件时，使用 Group By 作为排序条件（数据库本身规则
     private void appendDerivedOrderBy(final SelectStatement selectStatement) {
         if (!selectStatement.getGroupByItems().isEmpty() && selectStatement.getOrderByItems().isEmpty()) {
             selectStatement.getOrderByItems().addAll(selectStatement.getGroupByItems());

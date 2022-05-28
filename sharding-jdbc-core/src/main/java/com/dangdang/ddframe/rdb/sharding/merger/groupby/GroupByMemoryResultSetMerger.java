@@ -38,14 +38,14 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 /**
- * Memory merger for group by.
+ * Memory merger for group by. 基于 内存 分组归并结果集实现。
  *
  * @author zhangliang
  */
 public final class GroupByMemoryResultSetMerger extends AbstractMemoryResultSetMerger {
-    
+    // Select SQL语句对象
     private final SelectStatement selectStatement;
-    
+    // 内存结果集
     private final Iterator<MemoryResultSetRow> memoryResultSetRows;
     
     public GroupByMemoryResultSetMerger(
@@ -56,29 +56,29 @@ public final class GroupByMemoryResultSetMerger extends AbstractMemoryResultSetM
     }
     
     private Iterator<MemoryResultSetRow> init(final List<ResultSet> resultSets) throws SQLException {
-        Map<GroupByValue, MemoryResultSetRow> dataMap = new HashMap<>(1024);
-        Map<GroupByValue, Map<AggregationSelectItem, AggregationUnit>> aggregationMap = new HashMap<>(1024);
-        for (ResultSet each : resultSets) {
+        Map<GroupByValue, MemoryResultSetRow> dataMap = new HashMap<>(1024); //  // 分组条件值与内存记录映射
+        Map<GroupByValue, Map<AggregationSelectItem, AggregationUnit>> aggregationMap = new HashMap<>(1024); // 分组条件值与聚合列映射
+        for (ResultSet each : resultSets) { // 遍历结果集
             while (each.next()) {
-                GroupByValue groupByValue = new GroupByValue(each, selectStatement.getGroupByItems());
-                initForFirstGroupByValue(each, groupByValue, dataMap, aggregationMap);
-                aggregate(each, groupByValue, aggregationMap);
+                GroupByValue groupByValue = new GroupByValue(each, selectStatement.getGroupByItems());  // 生成分组条件
+                initForFirstGroupByValue(each, groupByValue, dataMap, aggregationMap); // 初始化分组条件到 dataMap、aggregationMap 映射
+                aggregate(each, groupByValue, aggregationMap); // 归并聚合值
             }
         }
-        setAggregationValueToMemoryRow(dataMap, aggregationMap);
-        List<MemoryResultSetRow> result = getMemoryResultSetRows(dataMap);
-        if (!result.isEmpty()) {
+        setAggregationValueToMemoryRow(dataMap, aggregationMap); // 设置聚合列结果到内存记录
+        List<MemoryResultSetRow> result = getMemoryResultSetRows(dataMap); // 内存排序
+        if (!result.isEmpty()) { // 设置当前 ResultSet，这样 #getValue() 能拿到记录
             setCurrentResultSetRow(result.get(0));
         }
         return result.iterator();
     }
-    
+    // 初始化分组条件到 dataMap，aggregationMap 映射中
     private void initForFirstGroupByValue(final ResultSet resultSet, final GroupByValue groupByValue, final Map<GroupByValue, MemoryResultSetRow> dataMap, 
                                           final Map<GroupByValue, Map<AggregationSelectItem, AggregationUnit>> aggregationMap) throws SQLException {
-        if (!dataMap.containsKey(groupByValue)) {
+        if (!dataMap.containsKey(groupByValue)) { // 初始化分组条件到 dataMap
             dataMap.put(groupByValue, new MemoryResultSetRow(resultSet));
         }
-        if (!aggregationMap.containsKey(groupByValue)) {
+        if (!aggregationMap.containsKey(groupByValue)) { // 初始化分组条件到 aggregationMap
             Map<AggregationSelectItem, AggregationUnit> map = Maps.toMap(selectStatement.getAggregationSelectItems(), new Function<AggregationSelectItem, AggregationUnit>() {
                 
                 @Override
@@ -89,14 +89,14 @@ public final class GroupByMemoryResultSetMerger extends AbstractMemoryResultSetM
             aggregationMap.put(groupByValue, map);
         }
     }
-    
+    //  聚合完每个分组条件后，将聚合列结果 aggregationMap 合并到 dataMap。
     private void aggregate(final ResultSet resultSet, final GroupByValue groupByValue, final Map<GroupByValue, Map<AggregationSelectItem, AggregationUnit>> aggregationMap) throws SQLException {
-        for (AggregationSelectItem each : selectStatement.getAggregationSelectItems()) {
+        for (AggregationSelectItem each : selectStatement.getAggregationSelectItems()) {  // 遍历内存记录
             List<Comparable<?>> values = new ArrayList<>(2);
             if (each.getDerivedAggregationSelectItems().isEmpty()) {
                 values.add(getAggregationValue(resultSet, each));
             } else {
-                for (AggregationSelectItem derived : each.getDerivedAggregationSelectItems()) {
+                for (AggregationSelectItem derived : each.getDerivedAggregationSelectItems()) {  // 遍历每个聚合列
                     values.add(getAggregationValue(resultSet, derived));
                 }
             }
@@ -117,7 +117,7 @@ public final class GroupByMemoryResultSetMerger extends AbstractMemoryResultSetM
             }
         }
     }
-    
+    // 对内存记录进行内存排序
     private List<MemoryResultSetRow> getMemoryResultSetRows(final Map<GroupByValue, MemoryResultSetRow> dataMap) {
         List<MemoryResultSetRow> result = new ArrayList<>(dataMap.values());
         Collections.sort(result, new GroupByRowComparator(selectStatement));

@@ -20,7 +20,7 @@ package com.dangdang.ddframe.rdb.sharding.executor.event;
 import java.util.List;
 
 /**
- * DQL execution event.
+ * DQL execution event. DQL类SQL执行时事件
  * 
  * @author gaohongtao
  */

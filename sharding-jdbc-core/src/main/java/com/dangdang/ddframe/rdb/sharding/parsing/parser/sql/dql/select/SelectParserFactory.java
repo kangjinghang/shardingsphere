@@ -36,7 +36,7 @@ import lombok.NoArgsConstructor;
 public final class SelectParserFactory {
     
     /**
-     * Create select parser instance.
+     * Create select parser instance. 创建Select语句解析器
      *
      * @param dbType database type
      * @param shardingRule databases and tables sharding rule

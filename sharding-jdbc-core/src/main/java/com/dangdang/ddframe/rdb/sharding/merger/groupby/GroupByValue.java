@@ -34,17 +34,17 @@ import java.util.List;
 @Getter
 @EqualsAndHashCode
 public final class GroupByValue {
-    
+    // 分组条件值数组
     private final List<?> groupValues;
     
     public GroupByValue(final ResultSet resultSet, final List<OrderItem> groupByItems) throws SQLException {
         groupValues = getGroupByValues(resultSet, groupByItems);
     }
-    
+    // 获得分组条件值数组。例如，`GROUP BY user_id, order_status` 返回的某条记录结果为 `userId = 1, order_status = 3`，对应的 `groupValues = [1, 3]`
     private List<?> getGroupByValues(final ResultSet resultSet, final List<OrderItem> groupByItems) throws SQLException {
         List<Object> result = new ArrayList<>(groupByItems.size());
         for (OrderItem each : groupByItems) {
-            result.add(resultSet.getObject(each.getIndex()));
+            result.add(resultSet.getObject(each.getIndex())); // 从结果集获得每个分组条件的值
         }
         return result;
     }

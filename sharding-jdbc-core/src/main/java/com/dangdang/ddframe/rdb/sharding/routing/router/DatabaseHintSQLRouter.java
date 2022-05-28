@@ -31,7 +31,7 @@ import com.dangdang.ddframe.rdb.sharding.util.SQLLogger;
 import java.util.List;
 
 /**
- * SQL router for hint database only.
+ * SQL router for hint database only. 通过提示且仅路由至数据库的SQL路由器
  * 
  * @author zhangiang
  */
@@ -48,15 +48,15 @@ public final class DatabaseHintSQLRouter implements SQLRouter {
     
     @Override
     public SQLStatement parse(final String logicSQL, final int parametersSize) {
-        return new SQLJudgeEngine(logicSQL).judge();
+        return new SQLJudgeEngine(logicSQL).judge(); // 只解析 SQL 类型，即 SELECT / UPDATE / DELETE / INSERT
     }
     
     @Override
     // TODO insert SQL need parse gen key
     public SQLRouteResult route(final String logicSQL, final List<Object> parameters, final SQLStatement sqlStatement) {
         SQLRouteResult result = new SQLRouteResult(sqlStatement);
-        RoutingResult routingResult = new DatabaseHintRoutingEngine(shardingRule.getDataSourceRule(), shardingRule.getDatabaseShardingStrategy()).route();
-        for (TableUnit each : routingResult.getTableUnits().getTableUnits()) {
+        RoutingResult routingResult = new DatabaseHintRoutingEngine(shardingRule.getDataSourceRule(), shardingRule.getDatabaseShardingStrategy()).route(); // 路由
+        for (TableUnit each : routingResult.getTableUnits().getTableUnits()) { // SQL最小执行单元
             result.getExecutionUnits().add(new SQLExecutionUnit(each.getDataSourceName(), logicSQL));
         }
         if (showSQL) {

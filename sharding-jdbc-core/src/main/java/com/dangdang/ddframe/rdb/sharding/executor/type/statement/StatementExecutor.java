@@ -30,7 +30,7 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * Statement Executor for multiple threads.
+ * Statement Executor for multiple threads. 多线程执行静态语句对象请求的执行器
  * 
  * @author gaohongtao
  * @author caohao
@@ -46,9 +46,9 @@ public final class StatementExecutor {
     private final Collection<StatementUnit> statementUnits;
     
     /**
-     * Execute query.
+     * Execute query. 执行SQL查询
      * 
-     * @return result set list
+     * @return result set list 结果集列表
      */
     public List<ResultSet> executeQuery() {
         return executorEngine.executeStatement(sqlType, statementUnits, new ExecuteCallback<ResultSet>() {
@@ -61,9 +61,9 @@ public final class StatementExecutor {
     }
     
     /**
-     * Execute update.
+     * Execute update.  执行SQL更新
      * 
-     * @return effected records count
+     * @return effected records count 更新数量
      */
     public int executeUpdate() {
         return executeUpdate(new Updater() {
@@ -133,7 +133,7 @@ public final class StatementExecutor {
         });
         return accumulate(results);
     }
-    
+    // 计算总的更新数量
     private int accumulate(final List<Integer> results) {
         int result = 0;
         for (Integer each : results) {
@@ -143,9 +143,9 @@ public final class StatementExecutor {
     }
     
     /**
-     * Execute SQL.
+     * Execute SQL. 执行SQL请求
      *
-     * @return return true if is DQL, false if is DML
+     * @return return true if is DQL, false if is DML true表示执行DQL语句, false表示执行的DML语句
      */
     public boolean execute() {
         return execute(new Executor() {

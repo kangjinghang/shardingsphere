@@ -32,7 +32,7 @@ public class SQLUtil {
     /**
      * Get exactly value for SQL expression.
      * 
-     * <p>remove special char for SQL expression</p>
+     * <p>remove special char for SQL expression</p> 从 value 中去除 []`'" 这些特殊字符
      * 
      * @param value SQL expression
      * @return exactly SQL expression

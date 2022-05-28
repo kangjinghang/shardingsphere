@@ -37,16 +37,16 @@ import java.util.Map;
 public final class MasterSlaveDataSourceFactory {
     
     /**
-     * Create master-slave data source.
+     * Create master-slave data source. 创建读写分离数据源
      * 
      * <p>One master data source can configure multiple slave data source.</p>
      * 
      * @deprecated will remove at 1.6.0
-     * @param name data source name
-     * @param masterDataSource data source for master
-     * @param slaveDataSource data source for slave
-     * @param otherSlaveDataSources other data sources for slave
-     * @return master-slave data source
+     * @param name data source name  读写分离数据源名称
+     * @param masterDataSource data source for master 主节点数据源
+     * @param slaveDataSource data source for slave 从节点数据源
+     * @param otherSlaveDataSources other data sources for slave 其他从节点数据源
+     * @return master-slave data source 读写分离数据源
      * @throws SQLException SQL exception
      */
     @Deprecated

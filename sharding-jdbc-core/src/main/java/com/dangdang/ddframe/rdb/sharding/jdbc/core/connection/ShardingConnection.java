@@ -75,12 +75,12 @@ public final class ShardingConnection extends AbstractConnectionAdapter {
     }
     
     /**
-     * Get database connection via data source name.
+     * Get database connection via data source name. 根据数据源名称获取相应的数据库连接
      * 
-     * @param dataSourceName data source name
-     * @param sqlType SQL type
-     * @return all database connections via data source name
-     * @throws SQLException SQL exception
+     * @param dataSourceName data source name 数据源名称
+     * @param sqlType SQL type SQL语句类型
+     * @return all database connections via data source name 数据库连接
+     * @throws SQLException SQL exception SQL异常
      */
     public Connection getConnection(final String dataSourceName, final SQLType sqlType) throws SQLException {
         if (getCachedConnections().containsKey(dataSourceName)) {
@@ -89,7 +89,7 @@ public final class ShardingConnection extends AbstractConnectionAdapter {
         DataSource dataSource = shardingContext.getShardingRule().getDataSourceRule().getDataSource(dataSourceName);
         Preconditions.checkState(null != dataSource, "Missing the rule of %s in DataSourceRule", dataSourceName);
         String realDataSourceName;
-        if (dataSource instanceof MasterSlaveDataSource) {
+        if (dataSource instanceof MasterSlaveDataSource) {  // 读写分离
             NamedDataSource namedDataSource = ((MasterSlaveDataSource) dataSource).getDataSource(sqlType);
             realDataSourceName = namedDataSource.getName();
             if (getCachedConnections().containsKey(realDataSourceName)) {
@@ -100,8 +100,8 @@ public final class ShardingConnection extends AbstractConnectionAdapter {
             realDataSourceName = dataSourceName;
         }
         Connection result = dataSource.getConnection();
-        getCachedConnections().put(realDataSourceName, result);
-        replayMethodsInvocation(result);
+        getCachedConnections().put(realDataSourceName, result); // 添加到连接缓存
+        replayMethodsInvocation(result); // 回放 Connection 方法
         return result;
     }
     

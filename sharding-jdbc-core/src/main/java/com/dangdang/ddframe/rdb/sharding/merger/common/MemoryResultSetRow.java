@@ -28,13 +28,13 @@ import java.sql.SQLException;
  * @author zhangliang
  */
 public class MemoryResultSetRow {
-    
+    // 行数据
     private final Object[] data;
     
     public MemoryResultSetRow(final ResultSet resultSet) throws SQLException {
         data = load(resultSet);
     }
-    
+    // 加载 ResultSet 当前行数据到内存
     private Object[] load(final ResultSet resultSet) throws SQLException {
         int columnCount = resultSet.getMetaData().getColumnCount();
         Object[] result = new Object[columnCount];

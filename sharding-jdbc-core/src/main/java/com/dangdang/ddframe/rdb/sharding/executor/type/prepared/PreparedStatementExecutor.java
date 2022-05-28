@@ -29,7 +29,7 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * PreparedStatement Executor for multiple threads.
+ * PreparedStatement Executor for multiple threads. 预编译语句对象请求的执行器
  * 
  * @author zhangliang
  * @author caohao
@@ -70,7 +70,7 @@ public final class PreparedStatementExecutor {
             
             @Override
             public Integer execute(final BaseStatementUnit baseStatementUnit) throws Exception {
-                return ((PreparedStatement) baseStatementUnit.getStatement()).executeUpdate();
+                return ((PreparedStatement) baseStatementUnit.getStatement()).executeUpdate();  // 调用 PreparedStatement#executeUpdate()
             }
         });
         return accumulate(results);

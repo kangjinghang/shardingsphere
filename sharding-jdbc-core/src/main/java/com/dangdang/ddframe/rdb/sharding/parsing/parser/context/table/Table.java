@@ -33,8 +33,8 @@ import lombok.ToString;
 @EqualsAndHashCode
 @ToString
 public final class Table {
-    
+    // 表
     private final String name;
-    
+    // 别名
     private final Optional<String> alias;
 }

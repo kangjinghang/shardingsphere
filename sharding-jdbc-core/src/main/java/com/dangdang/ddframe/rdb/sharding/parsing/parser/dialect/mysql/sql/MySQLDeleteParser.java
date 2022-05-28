@@ -35,7 +35,7 @@ public final class MySQLDeleteParser extends AbstractDeleteParser {
     public MySQLDeleteParser(final ShardingRule shardingRule, final LexerEngine lexerEngine) {
         super(shardingRule, lexerEngine, new MySQLDeleteClauseParserFacade(shardingRule, lexerEngine));
     }
-    
+    // MYSQL：LOW_PRIORITY、QUICK、IGNORE、FROM
     @Override
     protected Keyword[] getSkippedKeywordsBetweenDeleteAndTable() {
         return new Keyword[] {MySQLKeyword.LOW_PRIORITY, MySQLKeyword.QUICK, MySQLKeyword.IGNORE, DefaultKeyword.FROM};

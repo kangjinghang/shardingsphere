@@ -30,7 +30,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 /**
- * Best efforts delivery B.A.S.E transaction asynchronized job.
+ * Best efforts delivery B.A.S.E transaction asynchronized job. 内嵌的最大努力送达型异步作业
  * 
  * @author zhangliang
  * @author caohao

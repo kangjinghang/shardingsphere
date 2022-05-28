@@ -33,24 +33,24 @@ import java.util.Map;
 import java.util.TreeMap;
 
 /**
- * ResultSet merge engine.
+ * ResultSet merge engine. 分片结果集归并引擎
  *
  * @author zhangliang
  */
 public final class MergeEngine {
-    
+    // 结果集集合
     private final List<ResultSet> resultSets;
-    
+    // Select SQL语句对象
     private final SelectStatement selectStatement;
-    
+    // 查询列名与位置映射，通过 columnLabelIndexMap，可以很方便的使用查询列名获得在返回结果记录列( header )的第几列。
     private final Map<String, Integer> columnLabelIndexMap;
     
     public MergeEngine(final List<ResultSet> resultSets, final SelectStatement selectStatement) throws SQLException {
         this.resultSets = resultSets;
         this.selectStatement = selectStatement;
-        columnLabelIndexMap = getColumnLabelIndexMap(resultSets.get(0));
+        columnLabelIndexMap = getColumnLabelIndexMap(resultSets.get(0)); // 获得 查询列名与位置映射
     }
-    
+    // 获得 查询列名与位置映射
     private Map<String, Integer> getColumnLabelIndexMap(final ResultSet resultSet) throws SQLException {
         ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
         Map<String, Integer> result = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
@@ -61,19 +61,19 @@ public final class MergeEngine {
     }
     
     /**
-     * Merge result sets.
+     * Merge result sets. 合并结果集
      *
-     * @return merged result set.
-     * @throws SQLException SQL exception
+     * @return merged result set. 归并完毕后的结果集
+     * @throws SQLException SQL exception SQL异常
      */
     public ResultSetMerger merge() throws SQLException {
-        selectStatement.setIndexForItems(columnLabelIndexMap);
-        return decorate(build());
+        selectStatement.setIndexForItems(columnLabelIndexMap); // 设置查询列位置信息
+        return decorate(build()); // 返回合适的归并结果集接口( ResultSetMerger ) 实现
     }
     
     private ResultSetMerger build() throws SQLException {
         if (!selectStatement.getGroupByItems().isEmpty() || !selectStatement.getAggregationSelectItems().isEmpty()) {
-            if (selectStatement.isSameGroupByAndOrderByItems()) {
+            if (selectStatement.isSameGroupByAndOrderByItems()) { // 分组 或 聚合列
                 return new GroupByStreamResultSetMerger(columnLabelIndexMap, resultSets, selectStatement);
             } else {
                 return new GroupByMemoryResultSetMerger(columnLabelIndexMap, resultSets, selectStatement);

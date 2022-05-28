@@ -24,7 +24,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 /**
- * Try confirm cancel B.A.S.E transaction.
+ * Try confirm cancel B.A.S.E transaction. TCC型柔性事务
  * 
  * @author zhangliang
  */

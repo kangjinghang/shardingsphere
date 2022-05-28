@@ -43,7 +43,7 @@ import lombok.NoArgsConstructor;
 public final class SQLParserFactory {
     
     /**
-     * Create SQL parser.
+     * Create SQL parser. 获取 SQL解析器
      *
      * @param dbType database type
      * @param tokenType token type
@@ -55,7 +55,7 @@ public final class SQLParserFactory {
         if (!(tokenType instanceof DefaultKeyword)) {
             throw new SQLParsingUnsupportedException(tokenType);
         }
-        switch ((DefaultKeyword) tokenType)  {
+        switch ((DefaultKeyword) tokenType)  { // 获取对应 SQL语句解析器
             case SELECT:
                 return SelectParserFactory.newInstance(dbType, shardingRule, lexerEngine);
             case INSERT:

@@ -46,24 +46,24 @@ public class SelectListClauseParser implements SQLClauseParser {
      */
     public void parse(final SelectStatement selectStatement, final List<SelectItem> items) {
         do {
-            selectStatement.getItems().add(parseSelectItem(selectStatement));
+            selectStatement.getItems().add(parseSelectItem(selectStatement)); // 解析单个选择项
         } while (lexerEngine.skipIfEqual(Symbol.COMMA));
-        selectStatement.setSelectListLastPosition(lexerEngine.getCurrentToken().getEndPosition() - lexerEngine.getCurrentToken().getLiterals().length());
+        selectStatement.setSelectListLastPosition(lexerEngine.getCurrentToken().getEndPosition() - lexerEngine.getCurrentToken().getLiterals().length());  // 设置 最后一个查询项下一个 Token 的开始位置
         items.addAll(selectStatement.getItems());
     }
     
     private SelectItem parseSelectItem(final SelectStatement selectStatement) {
-        lexerEngine.skipIfEqual(getSkippedKeywordsBeforeSelectItem());
+        lexerEngine.skipIfEqual(getSkippedKeywordsBeforeSelectItem()); // Oracle 独有
         SelectItem result;
-        if (isRowNumberSelectItem()) {
+        if (isRowNumberSelectItem()) { // 第四种情况，SQL Server 独有
             result = parseRowNumberSelectItem(selectStatement);
-        } else if (isStarSelectItem()) {
+        } else if (isStarSelectItem()) { // 第一种情况，* 通用选择项，SELECT *
             selectStatement.setContainStar(true);
             result = parseStarSelectItem();
-        } else if (isAggregationSelectItem()) {
+        } else if (isAggregationSelectItem()) { // 第二种情况，聚合选择项。例如，SELECT COUNT(user_id) FROM t_user 的 COUNT(user_id)
             result = parseAggregationSelectItem(selectStatement);
             parseRestSelectItem(selectStatement);
-        } else {
+        } else { // 第三种情况，非 * 通用选择项
             result = new CommonSelectItem(SQLUtil.getExactlyValue(parseCommonSelectItem(selectStatement) + parseRestSelectItem(selectStatement)), aliasClauseParser.parse());
         }
         return result;
@@ -80,7 +80,7 @@ public class SelectListClauseParser implements SQLClauseParser {
     protected SelectItem parseRowNumberSelectItem(final SelectStatement selectStatement) {
         throw new UnsupportedOperationException("Cannot support special select item.");
     }
-    
+    // 为什么要有 这个 判断呢？ SELECT `*` FROM t_user; // 也能达到查询所有字段的效果
     private boolean isStarSelectItem() {
         return Symbol.STAR.getLiterals().equals(SQLUtil.getExactlyValue(lexerEngine.getCurrentToken().getLiterals()));
     }
@@ -112,7 +112,7 @@ public class SelectListClauseParser implements SQLClauseParser {
         } else if (lexerEngine.equalAny(Symbol.DOT)) {
             String tableName = SQLUtil.getExactlyValue(literals);
             if (shardingRule.tryFindTableRule(tableName).isPresent() || shardingRule.findBindingTableRule(tableName).isPresent()) {
-                selectStatement.getSqlTokens().add(new TableToken(position, literals));
+                selectStatement.getSqlTokens().add(new TableToken(position, literals)); // 添加 TableToken 表标记对象
             }
             result.append(lexerEngine.getCurrentToken().getLiterals());
             lexerEngine.nextToken();

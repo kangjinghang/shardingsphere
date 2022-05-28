@@ -24,16 +24,16 @@ import com.dangdang.ddframe.rdb.sharding.parsing.parser.context.limit.Limit;
 import java.sql.SQLException;
 
 /**
- * Decorator merger for limit.
+ * Decorator merger for limit. 基于 Decorator 分页结果集归并实现
  *
  * @author zhangliang
  */
 public final class LimitDecoratorResultSetMerger extends AbstractDecoratorResultSetMerger {
-    
+    // 分页条件
     private final Limit limit;
-    
+    // 是否全部记录都跳过了，即无符合条件记录
     private final boolean skipAll;
-    
+    // 当前已返回行数
     private int rowNumber;
     
     public LimitDecoratorResultSetMerger(final ResultSetMerger resultSetMerger, final Limit limit) throws SQLException {
@@ -43,12 +43,12 @@ public final class LimitDecoratorResultSetMerger extends AbstractDecoratorResult
     }
     
     private boolean skipOffset() throws SQLException {
-        for (int i = 0; i < limit.getOffsetValue(); i++) {
+        for (int i = 0; i < limit.getOffsetValue(); i++) { // 跳过 skip 记录
             if (!getResultSetMerger().next()) {
                 return true;
             }
         }
-        rowNumber = limit.isRowCountRewriteFlag() ? 0 : limit.getOffsetValue();
+        rowNumber = limit.isRowCountRewriteFlag() ? 0 : limit.getOffsetValue(); // 行数
         return false;
     }
     
@@ -57,9 +57,9 @@ public final class LimitDecoratorResultSetMerger extends AbstractDecoratorResult
         if (skipAll) {
             return false;
         }
-        if (limit.getRowCountValue() > -1) {
+        if (limit.getRowCountValue() > -1) { // 获得下一条记录
             return ++rowNumber <= limit.getRowCountValue() && getResultSetMerger().next();
         }
-        return getResultSetMerger().next();
+        return getResultSetMerger().next(); // 部分db 可以直 offset，不写 limit 行数，例如 oracle
     }
 }

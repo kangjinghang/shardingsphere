@@ -18,7 +18,7 @@
 package com.dangdang.ddframe.rdb.sharding.parsing.lexer.token;
 
 /**
- * Default keyword.
+ * Default keyword. 词法关键词
  * 
  * @author zhangliang 
  */

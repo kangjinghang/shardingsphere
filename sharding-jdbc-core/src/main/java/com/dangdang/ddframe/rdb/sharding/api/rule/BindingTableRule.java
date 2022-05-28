@@ -55,15 +55,15 @@ public final class BindingTableRule {
     }
     
     /**
-     * Deduce actual table name from other actual table name in same binding table rule.
+     * Deduce actual table name from other actual table name in same binding table rule. 根据其他Binding表真实表名称获取相应的真实Binding表名称
      * 
-     * @param dataSource data source name
-     * @param logicTable logic table name
-     * @param otherActualTable other actual table name in same binding table rule
-     * @return actual table name
+     * @param dataSource data source name  数据源名称
+     * @param logicTable logic table name 逻辑表名称
+     * @param otherActualTable other actual table name in same binding table rule 其他真实Binding表名称
+     * @return actual table name  真实Binding表名称
      */
     public String getBindingActualTable(final String dataSource, final String logicTable, final String otherActualTable) {
-        int index = -1;
+        int index = -1; // 计算 otherActualTable 在其 TableRule 的 actualTable 是第几个
         for (TableRule each : tableRules) {
             if (each.isDynamic()) {
                 throw new UnsupportedOperationException("Dynamic table cannot support Binding table.");
@@ -74,7 +74,7 @@ public final class BindingTableRule {
             }
         }
         Preconditions.checkState(-1 != index, String.format("Actual table [%s].[%s] is not in table config", dataSource, otherActualTable));
-        for (TableRule each : tableRules) {
+        for (TableRule each : tableRules) { // 计算 logicTable 在其 TableRule 的 第index 的 真实表
             if (each.getLogicTable().equalsIgnoreCase(logicTable)) {
                 return each.getActualTables().get(index).getTableName();
             }

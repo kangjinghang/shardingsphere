@@ -31,7 +31,7 @@ public class InsertSetClauseParser implements SQLClauseParser {
     private final LexerEngine lexerEngine;
     
     /**
-     * Parse insert set.
+     * Parse insert set. 例如：INSERT INTO test SET id = 4  ON DUPLICATE KEY UPDATE name = 'doubi', name = 'hehe'; INSERT INTO test SET id = 4, name = 'hehe';
      *
      * @param insertStatement insert statement
      */
@@ -40,10 +40,10 @@ public class InsertSetClauseParser implements SQLClauseParser {
             return;
         }
         do {
-            Column column = new Column(SQLUtil.getExactlyValue(lexerEngine.getCurrentToken().getLiterals()), insertStatement.getTables().getSingleTableName());
+            Column column = new Column(SQLUtil.getExactlyValue(lexerEngine.getCurrentToken().getLiterals()), insertStatement.getTables().getSingleTableName()); // 插入字段
             lexerEngine.nextToken();
-            lexerEngine.accept(Symbol.EQ);
-            SQLExpression sqlExpression;
+            lexerEngine.accept(Symbol.EQ);  // 等号
+            SQLExpression sqlExpression;  // 【值】表达式
             if (lexerEngine.equalAny(Literals.INT)) {
                 sqlExpression = new SQLNumberExpression(Integer.parseInt(lexerEngine.getCurrentToken().getLiterals()));
             } else if (lexerEngine.equalAny(Literals.FLOAT)) {
@@ -64,7 +64,7 @@ public class InsertSetClauseParser implements SQLClauseParser {
             } else {
                 lexerEngine.skipUntil(Symbol.COMMA, DefaultKeyword.ON);
             }
-        } while (lexerEngine.skipIfEqual(Symbol.COMMA));
+        } while (lexerEngine.skipIfEqual(Symbol.COMMA));  // 字段以 "," 分隔
     }
     
     protected Keyword[] getCustomizedInsertKeywords() {

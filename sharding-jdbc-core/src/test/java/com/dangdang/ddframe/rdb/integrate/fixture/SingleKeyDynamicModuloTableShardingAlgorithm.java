@@ -24,7 +24,7 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;
-
+// 动态计算分片需要怎么实现分片算法
 @RequiredArgsConstructor
 public final class SingleKeyDynamicModuloTableShardingAlgorithm implements SingleKeyTableShardingAlgorithm<Integer> {
     

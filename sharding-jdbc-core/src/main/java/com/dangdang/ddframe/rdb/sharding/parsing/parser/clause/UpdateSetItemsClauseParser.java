@@ -24,7 +24,7 @@ public final class UpdateSetItemsClauseParser implements SQLClauseParser {
     }
     
     /**
-     * Parse set items.
+     * Parse set items. 解析多个 SET 项
      *
      * @param updateStatement DML statement
      */
@@ -32,15 +32,15 @@ public final class UpdateSetItemsClauseParser implements SQLClauseParser {
         lexerEngine.accept(DefaultKeyword.SET);
         do {
             parseSetItem(updateStatement);
-        } while (lexerEngine.skipIfEqual(Symbol.COMMA));
+        } while (lexerEngine.skipIfEqual(Symbol.COMMA)); // 以 "," 分隔
     }
-    
+    // 解析单个 SET 项
     private void parseSetItem(final DMLStatement updateStatement) {
         parseSetColumn(updateStatement);
         lexerEngine.skipIfEqual(Symbol.EQ, Symbol.COLON_EQ);
         parseSetValue(updateStatement);
     }
-    
+    // 解析单个 SET 项
     private void parseSetColumn(final DMLStatement updateStatement) {
         if (lexerEngine.equalAny(Symbol.LEFT_PAREN)) {
             lexerEngine.skipParentheses(updateStatement);
@@ -49,14 +49,14 @@ public final class UpdateSetItemsClauseParser implements SQLClauseParser {
         int beginPosition = lexerEngine.getCurrentToken().getEndPosition();
         String literals = lexerEngine.getCurrentToken().getLiterals();
         lexerEngine.nextToken();
-        if (lexerEngine.skipIfEqual(Symbol.DOT)) {
+        if (lexerEngine.skipIfEqual(Symbol.DOT)) {  // 字段有别名
             if (updateStatement.getTables().getSingleTableName().equalsIgnoreCase(SQLUtil.getExactlyValue(literals))) {
                 updateStatement.getSqlTokens().add(new TableToken(beginPosition - literals.length(), literals));
             }
             lexerEngine.nextToken();
         }
     }
-    
+    // 解析单个 SET 值
     private void parseSetValue(final DMLStatement updateStatement) {
         expressionClauseParser.parse(updateStatement);
     }

@@ -25,7 +25,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * Order item.
+ * Order item. 排序项。属于分片上下文信息
  *
  * @author zhangliang
  */
@@ -34,17 +34,17 @@ import lombok.ToString;
 @EqualsAndHashCode
 @ToString
 public final class OrderItem {
-    
+    // 所属表别名
     private final Optional<String> owner;
-    
+    // 排序字段
     private final Optional<String> name;
-    
+    // 排序类型
     private final OrderType type;
     
     private final OrderType nullOrderType;
-    
+    // 按照第几个查询字段排序。ORDER BY 数字 的 数字代表的是第几个字段
     private int index = -1;
-    
+    // 字段在查询项({@link SelectItem} 的别名
     private Optional<String> alias;
     
     public OrderItem(final String name, final OrderType type, final OrderType nullOrderType, final Optional<String> alias) {

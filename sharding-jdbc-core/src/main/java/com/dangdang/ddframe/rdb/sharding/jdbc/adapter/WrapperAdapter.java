@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 /**
- * Adapter for {@code Wrapper}.
+ * Adapter for {@code Wrapper}. JDBC Wrapper 适配类
  * 
  * @author zhangliang
  */
@@ -49,7 +49,7 @@ public class WrapperAdapter implements Wrapper {
     }
     
     /**
-     * 记录方法调用.
+     * 记录方法调用. 提供子类用
      * 
      * @param targetClass 目标类
      * @param methodName 方法名称
@@ -65,7 +65,7 @@ public class WrapperAdapter implements Wrapper {
     }
     
     /**
-     * 回放记录的方法调用.
+     * 回放记录的方法调用. 提供子类用
      * 
      * @param target 目标对象
      */
@@ -74,14 +74,14 @@ public class WrapperAdapter implements Wrapper {
             each.invoke(target);
         }
     }
-    
+    // 抛出异常链。提供子类用
     protected void throwSQLExceptionIfNecessary(final Collection<SQLException> exceptions) throws SQLException {
-        if (exceptions.isEmpty()) {
+        if (exceptions.isEmpty()) {  // 为空不抛出异常
             return;
         }
         SQLException ex = new SQLException();
         for (SQLException each : exceptions) {
-            ex.setNextException(each);
+            ex.setNextException(each); // 异常链
         }
         throw ex;
     }

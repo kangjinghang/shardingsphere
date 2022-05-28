@@ -26,7 +26,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 /**
- * Default distributed primary key generator.
+ * Default distributed primary key generator. 默认的主键生成器。
  * 
  * <p>
  * Use snowflake algorithm. Length is 64 bit.
@@ -47,24 +47,24 @@ import java.util.Date;
  */
 @Slf4j
 public final class DefaultKeyGenerator implements KeyGenerator {
-    
+    // 时间偏移量，从2016年11月1日零点开始
     public static final long EPOCH;
-    
+    // 自增量占用比特
     private static final long SEQUENCE_BITS = 12L;
-    
+    // 工作进程ID比特
     private static final long WORKER_ID_BITS = 10L;
-    
+    // 自增量掩码（最大值）
     private static final long SEQUENCE_MASK = (1 << SEQUENCE_BITS) - 1;
-    
+    // 工作进程ID左移比特数（位数）
     private static final long WORKER_ID_LEFT_SHIFT_BITS = SEQUENCE_BITS;
-    
+    // 时间戳左移比特数（位数）
     private static final long TIMESTAMP_LEFT_SHIFT_BITS = WORKER_ID_LEFT_SHIFT_BITS + WORKER_ID_BITS;
-    
+    // 工作进程ID最大值
     private static final long WORKER_ID_MAX_VALUE = 1L << WORKER_ID_BITS;
     
     @Setter
     private static TimeService timeService = new TimeService();
-    
+    // 工作进程ID
     private static long workerId;
     
     static {
@@ -76,15 +76,15 @@ public final class DefaultKeyGenerator implements KeyGenerator {
         calendar.set(Calendar.MILLISECOND, 0);
         EPOCH = calendar.getTimeInMillis();
     }
-    
+    // 最后自增量
     private long sequence;
-    
+    // 最后生成编号时间戳，单位：毫秒
     private long lastTime;
     
     /**
-     * Set work process id.
+     * Set work process id. 设置工作进程Id
      * 
-     * @param workerId work process id
+     * @param workerId work process id 工作进程Id
      */
     public static void setWorkerId(final long workerId) {
         Preconditions.checkArgument(workerId >= 0L && workerId < WORKER_ID_MAX_VALUE);
@@ -92,28 +92,28 @@ public final class DefaultKeyGenerator implements KeyGenerator {
     }
     
     /**
-     * Generate key.
+     * Generate key. 生成Id
      * 
      * @return key type is @{@link Long}.
      */
     @Override
     public synchronized Number generateKey() {
-        long currentMillis = timeService.getCurrentMillis();
+        long currentMillis = timeService.getCurrentMillis(); // 保证当前时间大于最后时间。时间回退会导致产生重复id
         Preconditions.checkState(lastTime <= currentMillis, "Clock is moving backwards, last time is %d milliseconds, current time is %d milliseconds", lastTime, currentMillis);
         if (lastTime == currentMillis) {
-            if (0L == (sequence = ++sequence & SEQUENCE_MASK)) {
-                currentMillis = waitUntilNextTime(currentMillis);
+            if (0L == (sequence = ++sequence & SEQUENCE_MASK)) {  // 当获得序号超过最大值时，归0，并去获得新的时间
+                currentMillis = waitUntilNextTime(currentMillis); // 去获得新的时间，直到大于当前时间
             }
         } else {
             sequence = 0;
         }
-        lastTime = currentMillis;
+        lastTime = currentMillis; // 设置最后时间戳
         if (log.isDebugEnabled()) {
             log.debug("{}-{}-{}", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(new Date(lastTime)), workerId, sequence);
         }
-        return ((currentMillis - EPOCH) << TIMESTAMP_LEFT_SHIFT_BITS) | (workerId << WORKER_ID_LEFT_SHIFT_BITS) | sequence;
+        return ((currentMillis - EPOCH) << TIMESTAMP_LEFT_SHIFT_BITS) | (workerId << WORKER_ID_LEFT_SHIFT_BITS) | sequence; // 生成编号
     }
-    
+    // 不停获得时间，直到大于最后时间
     private long waitUntilNextTime(final long lastTime) {
         long time = timeService.getCurrentMillis();
         while (time <= lastTime) {

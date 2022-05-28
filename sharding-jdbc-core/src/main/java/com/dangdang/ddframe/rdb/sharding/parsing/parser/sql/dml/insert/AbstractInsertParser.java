@@ -53,21 +53,21 @@ public abstract class AbstractInsertParser implements SQLParser {
     
     @Override
     public final DMLStatement parse() {
-        lexerEngine.nextToken();
+        lexerEngine.nextToken();  // 跳过 INSERT 关键字
         InsertStatement result = new InsertStatement();
-        insertClauseParserFacade.getInsertIntoClauseParser().parse(result);
-        insertClauseParserFacade.getInsertColumnsClauseParser().parse(result);
+        insertClauseParserFacade.getInsertIntoClauseParser().parse(result);  // 解析 INTO
+        insertClauseParserFacade.getInsertColumnsClauseParser().parse(result);  // 解析插入字段
         if (lexerEngine.equalAny(DefaultKeyword.SELECT, Symbol.LEFT_PAREN)) {
             throw new UnsupportedOperationException("Cannot INSERT SELECT");
         }
-        insertClauseParserFacade.getInsertValuesClauseParser().parse(result);
-        insertClauseParserFacade.getInsertSetClauseParser().parse(result);
-        appendGenerateKey(result);
+        insertClauseParserFacade.getInsertValuesClauseParser().parse(result);  // 第一种插入SQL情况：INSERT {VALUES | VALUES} 单条记录
+        insertClauseParserFacade.getInsertSetClauseParser().parse(result); // 第二种插入SQL情况：INSERT SET
+        appendGenerateKey(result);  // 自增主键
         return result;
     }
-    
+    // 当表设置自动生成键，并且插入SQL没写自增字段，增加该字段。例如：// 主键为user_id INSERT INTO t_user(nickname, age) VALUES (?, ?)
     private void appendGenerateKey(final InsertStatement insertStatement) {
-        String tableName = insertStatement.getTables().getSingleTableName();
+        String tableName = insertStatement.getTables().getSingleTableName(); // 当表设置自动生成键，并且插入SQL没写自增字段
         Optional<String> generateKeyColumn = shardingRule.getGenerateKeyColumn(tableName);
         if (!generateKeyColumn.isPresent() || null != insertStatement.getGeneratedKey()) {
             return;

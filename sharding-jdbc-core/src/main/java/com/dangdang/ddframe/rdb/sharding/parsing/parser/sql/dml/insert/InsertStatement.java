@@ -40,7 +40,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Insert statement.
+ * Insert statement. 插入SQL 解析结果
  *
  * @author zhangliang
  */
@@ -48,60 +48,60 @@ import java.util.List;
 @Setter
 @ToString
 public final class InsertStatement extends DMLStatement {
-    
+    // 插入字段
     private final Collection<Column> columns = new LinkedList<>();
     
     private final List<Conditions> multipleConditions = new LinkedList<>();
-    
+    // 插入字段 下一个Token 开始位置
     private int columnsListLastPosition;
     
     private int generateKeyColumnIndex = -1;
     
     private int afterValuesPosition;
-    
+    // 值字段 下一个Token 开始位置
     private int valuesListLastPosition;
     
     private GeneratedKey generatedKey;
     
     /**
-     * Append generate key token.
+     * Append generate key token. 追加自增主键标记对象
      *
      * @param shardingRule databases and tables sharding rule
      * @param parametersSize parameters size
      */
     public void appendGenerateKeyToken(final ShardingRule shardingRule, final int parametersSize) {
-        if (null != generatedKey) {
+        if (null != generatedKey) {  // SQL 里有主键列
             return;
         }
-        Optional<TableRule> tableRule = shardingRule.tryFindTableRule(getTables().getSingleTableName());
+        Optional<TableRule> tableRule = shardingRule.tryFindTableRule(getTables().getSingleTableName()); // TableRule 存在
         if (!tableRule.isPresent()) {
             return;
         }
-        Optional<GeneratedKeyToken> generatedKeysToken = findGeneratedKeyToken();
+        Optional<GeneratedKeyToken> generatedKeysToken = findGeneratedKeyToken(); // GeneratedKeyToken 存在
         if (!generatedKeysToken.isPresent()) {
             return;
         }
-        ItemsToken valuesToken = new ItemsToken(generatedKeysToken.get().getBeginPosition());
+        ItemsToken valuesToken = new ItemsToken(generatedKeysToken.get().getBeginPosition()); // 处理 GenerateKeyToken
         if (0 == parametersSize) {
             appendGenerateKeyToken(shardingRule, tableRule.get(), valuesToken);
         } else {
             appendGenerateKeyToken(shardingRule, tableRule.get(), valuesToken, parametersSize);
         }
-        getSqlTokens().remove(generatedKeysToken.get());
-        getSqlTokens().add(valuesToken);
+        getSqlTokens().remove(generatedKeysToken.get()); // 移除 generatedKeysToken
+        getSqlTokens().add(valuesToken); // 新增 ItemsToken
     }
-    
+    // 占位符参数数量 = 0 时，直接生成分布式主键，保持无占位符的做法
     private void appendGenerateKeyToken(final ShardingRule shardingRule, final TableRule tableRule, final ItemsToken valuesToken) {
-        Number generatedKey = shardingRule.generateKey(tableRule.getLogicTable());
-        valuesToken.getItems().add(generatedKey.toString());
-        getConditions().add(new Condition(new Column(tableRule.getGenerateKeyColumn(), tableRule.getLogicTable()), new SQLNumberExpression(generatedKey)), shardingRule);
-        this.generatedKey = new GeneratedKey(tableRule.getLogicTable(), -1, generatedKey);
+        Number generatedKey = shardingRule.generateKey(tableRule.getLogicTable());  // 生成分布式主键
+        valuesToken.getItems().add(generatedKey.toString()); // 添加到 ItemsToken
+        getConditions().add(new Condition(new Column(tableRule.getGenerateKeyColumn(), tableRule.getLogicTable()), new SQLNumberExpression(generatedKey)), shardingRule); // 增加 Condition，用于路由
+        this.generatedKey = new GeneratedKey(tableRule.getLogicTable(), -1, generatedKey); // 生成 GeneratedKey
     }
-    
+    // 占位符参数数量 > 0 时，生成自增列的占位符，保持有占位符的做法
     private void appendGenerateKeyToken(final ShardingRule shardingRule, final TableRule tableRule, final ItemsToken valuesToken, final int parametersSize) {
-        valuesToken.getItems().add(Symbol.QUESTION.getLiterals());
-        getConditions().add(new Condition(new Column(tableRule.getGenerateKeyColumn(), tableRule.getLogicTable()), new SQLPlaceholderExpression(parametersSize)), shardingRule);
-        generatedKey = new GeneratedKey(tableRule.getGenerateKeyColumn(), parametersSize, null);
+        valuesToken.getItems().add(Symbol.QUESTION.getLiterals()); // 生成占位符
+        getConditions().add(new Condition(new Column(tableRule.getGenerateKeyColumn(), tableRule.getLogicTable()), new SQLPlaceholderExpression(parametersSize)), shardingRule); // 增加 Condition，用于路由
+        generatedKey = new GeneratedKey(tableRule.getGenerateKeyColumn(), parametersSize, null); // 生成 GeneratedKey
     }
     
     private Optional<GeneratedKeyToken> findGeneratedKeyToken() {

@@ -15,7 +15,7 @@ public class MySQLDistinctClauseParser extends DistinctClauseParser {
     public MySQLDistinctClauseParser(final LexerEngine lexerEngine) {
         super(lexerEngine);
     }
-    
+    // MYSQL 加入 DISTINCTROW 关键字
     @Override
     protected Keyword[] getSynonymousKeywordsForDistinct() {
         return new Keyword[] {MySQLKeyword.DISTINCTROW};

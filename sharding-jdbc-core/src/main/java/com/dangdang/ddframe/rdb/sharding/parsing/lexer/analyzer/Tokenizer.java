@@ -124,7 +124,7 @@ public final class Tokenizer {
     }
     
     /**
-     * scan variable.
+     * scan variable. 扫描变量。在 MySQL 里，@代表用户变量；@@代表系统变量。在 SQLServer 里，有 @@。
      *
      * @return variable token
      */
@@ -144,12 +144,12 @@ public final class Tokenizer {
     }
     
     /**
-     * scan identifier.
+     * scan identifier.  扫描标识符
      *
      * @return identifier token
      */
     public Token scanIdentifier() {
-        if ('`' == charAt(offset)) {
+        if ('`' == charAt(offset)) {  // `字段`，例如：SELECT `id` FROM t_user 中的 `id`
             int length = getLengthUntilTerminatedChar('`');
             return new Token(Literals.IDENTIFIER, input.substring(offset, offset + length), offset + length);
         }
@@ -158,12 +158,12 @@ public final class Tokenizer {
             length++;
         }
         String literals = input.substring(offset, offset + length);
-        if (isAmbiguousIdentifier(literals)) {
+        if (isAmbiguousIdentifier(literals)) {  // 处理 order / group 作为表名
             return new Token(processAmbiguousIdentifier(offset + length, literals), literals, offset + length);
         }
-        return new Token(dictionary.findTokenType(literals, Literals.IDENTIFIER), literals, offset + length);
+        return new Token(dictionary.findTokenType(literals, Literals.IDENTIFIER), literals, offset + length); // 从 词法关键词 查找是否是 Keyword，如果是，则返回 Keyword，否则返回 Literals.IDENTIFIER
     }
-    
+    // 计算到结束字符的长度。处理类似 SELECT a AS `b``c` FROM table。此处连续的 "``" 不是结尾，如果传递的是 "`" 会产生误判，所以加了这个判断
     private int getLengthUntilTerminatedChar(final char terminatedChar) {
         int length = 1;
         while (terminatedChar != charAt(offset + length) || hasEscapeChar(terminatedChar, offset + length)) {
@@ -177,7 +177,7 @@ public final class Tokenizer {
         }
         return length + 1;
     }
-    
+    // 是否是 Escape 字符
     private boolean hasEscapeChar(final char charIdentifier, final int offset) {
         return charIdentifier == charAt(offset) && charIdentifier == charAt(offset + 1);
     }
@@ -185,11 +185,11 @@ public final class Tokenizer {
     private boolean isIdentifierChar(final char ch) {
         return CharType.isAlphabet(ch) || CharType.isDigital(ch) || '_' == ch || '$' == ch || '#' == ch;
     }
-    
+    // 是否是引起歧义的标识符。例如 "SELECT * FROM group"，此时 "group" 代表的是表名，而非词法关键词
     private boolean isAmbiguousIdentifier(final String literals) {
         return DefaultKeyword.ORDER.name().equalsIgnoreCase(literals) || DefaultKeyword.GROUP.name().equalsIgnoreCase(literals);
     }
-    
+    //  获取引起歧义的标识符对应的词法标记类型
     private TokenType processAmbiguousIdentifier(final int offset, final String literals) {
         int i = 0;
         while (CharType.isWhitespace(charAt(offset + i))) {
@@ -202,13 +202,13 @@ public final class Tokenizer {
     }
     
     /**
-     * scan hex decimal.
+     * scan hex decimal. 扫描十六进制数
      *
      * @return hex decimal token
      */
     public Token scanHexDecimal() {
         int length = HEX_BEGIN_SYMBOL_LENGTH;
-        if ('-' == charAt(offset + length)) {
+        if ('-' == charAt(offset + length)) { // 负数
             length++;
         }
         while (isHex(charAt(offset + length))) {
@@ -222,23 +222,23 @@ public final class Tokenizer {
     }
     
     /**
-     * scan number.
+     * scan number. 扫描数字，解析数字的结果会有两种：整数 和 浮点数.
      *
      * @return number token
      */
     public Token scanNumber() {
         int length = 0;
-        if ('-' == charAt(offset + length)) {
+        if ('-' == charAt(offset + length)) { // 负数
             length++;
         }
-        length += getDigitalLength(offset + length);
+        length += getDigitalLength(offset + length); // 浮点数
         boolean isFloat = false;
         if ('.' == charAt(offset + length)) {
             isFloat = true;
             length++;
             length += getDigitalLength(offset + length);
         }
-        if (isScientificNotation(offset + length)) {
+        if (isScientificNotation(offset + length)) { // 科学计数表示，例如：SELECT 7.823E5
             isFloat = true;
             length++;
             if ('+' == charAt(offset + length) || '-' == charAt(offset + length)) {
@@ -246,7 +246,7 @@ public final class Tokenizer {
             }
             length += getDigitalLength(offset + length);
         }
-        if (isBinaryNumber(offset + length)) {
+        if (isBinaryNumber(offset + length)) { // 浮点数，例如：SELECT 1.333F
             isFloat = true;
             length++;
         }
@@ -272,21 +272,21 @@ public final class Tokenizer {
     }
     
     /**
-     * scan chars.
+     * scan chars. 扫描字符串
      *
      * @return chars token
      */
     public Token scanChars() {
         return scanChars(charAt(offset));
     }
-    
+    // 扫描字符串
     private Token scanChars(final char terminatedChar) {
         int length = getLengthUntilTerminatedChar(terminatedChar);
         return new Token(Literals.CHARS, input.substring(offset + 1, offset + length - 1), offset + length);
     }
     
     /**
-     * scan symbol.
+     * scan symbol. 扫描符号
      *
      * @return symbol token
      */
@@ -296,7 +296,7 @@ public final class Tokenizer {
             length++;
         }
         String literals = input.substring(offset, offset + length);
-        Symbol symbol;
+        Symbol symbol;  // 倒序遍历，查询符合条件的 符号。例如 literals = ";;"，会是拆分成两个 ";"。如果基于正序，literals = "<="，会被解析成 "<" + "="。
         while (null == (symbol = Symbol.literalsOf(literals))) {
             literals = input.substring(offset, offset + --length);
         }

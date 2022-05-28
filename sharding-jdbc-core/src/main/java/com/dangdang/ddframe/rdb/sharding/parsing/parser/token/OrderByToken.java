@@ -21,13 +21,13 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
- * Order by token.
+ * Order by token. 排序标记对象。当无 Order By 条件时，使用 Group By 作为排序条件（数据库本身规则）。
  *
  * @author zhangliang
  */
 @RequiredArgsConstructor
 @Getter
 public final class OrderByToken implements SQLToken {
-    
+    // SQL 所在开始位置
     private final int beginPosition;
 }

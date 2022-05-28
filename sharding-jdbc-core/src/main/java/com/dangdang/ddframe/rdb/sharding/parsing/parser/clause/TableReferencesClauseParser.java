@@ -54,7 +54,7 @@ public class TableReferencesClauseParser implements SQLClauseParser {
     protected void parseTableReference(final SQLStatement sqlStatement, final boolean isSingleTableOnly) {
         parseTableFactor(sqlStatement, isSingleTableOnly);
     }
-    
+    // 解析单个表名和表别名
     protected final void parseTableFactor(final SQLStatement sqlStatement, final boolean isSingleTableOnly) {
         final int beginPosition = lexerEngine.getCurrentToken().getEndPosition() - lexerEngine.getCurrentToken().getLiterals().length();
         String literals = lexerEngine.getCurrentToken().getLiterals();
@@ -67,16 +67,16 @@ public class TableReferencesClauseParser implements SQLClauseParser {
         if (isSingleTableOnly || shardingRule.tryFindTableRule(tableName).isPresent() || shardingRule.findBindingTableRule(tableName).isPresent()
                 || shardingRule.getDataSourceRule().getDefaultDataSource().isPresent()) {
             sqlStatement.getSqlTokens().add(new TableToken(beginPosition, literals));
-            sqlStatement.getTables().add(new Table(tableName, alias));
+            sqlStatement.getTables().add(new Table(tableName, alias));  // 表 以及 表别名
         }
-        parseJoinTable(sqlStatement);
+        parseJoinTable(sqlStatement); // 这里调用 parseJoinTable() 而不是 parseTableFactor() ：下一个 Table 可能是子查询。 例如：SELECT * FROM t_order JOIN (SELECT * FROM t_order_item JOIN t_order_other ON )
         if (isSingleTableOnly && !sqlStatement.getTables().isSingleTable()) {
             throw new UnsupportedOperationException("Cannot support Multiple-Table.");
         }
     }
-    
+    // 解析 Join Table 或者 FROM 下一张 Table
     private void parseJoinTable(final SQLStatement sqlStatement) {
-        while (parseJoinType()) {
+        while (parseJoinType()) {  // 继续循环
             if (lexerEngine.equalAny(Symbol.LEFT_PAREN)) {
                 throw new UnsupportedOperationException("Cannot support sub query for join table.");
             }
@@ -103,13 +103,15 @@ public class TableReferencesClauseParser implements SQLClauseParser {
     }
     
     private void parseJoinCondition(final SQLStatement sqlStatement) {
-        if (lexerEngine.skipIfEqual(DefaultKeyword.ON)) {
+        if (lexerEngine.skipIfEqual(DefaultKeyword.ON)) {  // JOIN 表时 ON 条件
             do {
                 expressionClauseParser.parse(sqlStatement);
                 lexerEngine.accept(Symbol.EQ);
                 expressionClauseParser.parse(sqlStatement);
             } while (lexerEngine.skipIfEqual(DefaultKeyword.AND));
-        } else if (lexerEngine.skipIfEqual(DefaultKeyword.USING)) {
+        } else if (lexerEngine.skipIfEqual(DefaultKeyword.USING)) { // JOIN 表时 USING 为使用两表相同字段相同时对 ON 的简化。例如以下两条 SQL 等价：
+            // SELECT * FROM t_order o JOIN t_order_item i USING (order_id);
+            // SELECT * FROM t_order o JOIN t_order_item i ON o.order_id = i.order_id
             lexerEngine.skipParentheses(sqlStatement);
         }
     }

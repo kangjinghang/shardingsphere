@@ -20,7 +20,7 @@ public class SelectRestClauseParser implements SQLClauseParser {
     private final LexerEngine lexerEngine;
     
     /**
-     * Parse select rest.
+     * Parse select rest. 不支持 UNION / EXCEPT / INTERSECT / MINUS ，调用会抛出异常。
      */
     public final void parse() {
         Collection<Keyword> unsupportedRestKeywords = new LinkedList<>();

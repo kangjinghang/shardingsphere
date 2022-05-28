@@ -27,11 +27,11 @@ import java.util.List;
 public interface MasterSlaveLoadBalanceStrategy {
     
     /**
-     * Get data source.
+     * Get data source.  根据负载均衡策略获取从库数据源
      * 
-     * @param name master-slave logic data source name
+     * @param name master-slave logic data source name 读写分离数据源名称
      * @param masterDataSourceName name of master data sources
-     * @param slaveDataSourceNames names of slave data sources
+     * @param slaveDataSourceNames names of slave data sources 从库数据源列表
      * @return name of selected data source
      */
     String getDataSource(String name, String masterDataSourceName, List<String> slaveDataSourceNames);

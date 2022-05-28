@@ -37,7 +37,7 @@ public final class HintManagerHolder {
     public static final String DB_TABLE_NAME = "DB_TABLE_NAME";
     
     public static final String DB_COLUMN_NAME = "DB_COLUMN_NAME";
-    
+    // HintManager 线程变量
     private static final ThreadLocal<HintManager> HINT_MANAGER_HOLDER = new ThreadLocal<>();
     
     /**
@@ -88,7 +88,7 @@ public final class HintManagerHolder {
     }
     
     /**
-     * Adjust database sharding only.
+     * Adjust database sharding only. 判断是否当前只分库
      * 
      * @return database sharding only or not
      */
@@ -97,7 +97,7 @@ public final class HintManagerHolder {
     }
     
     /**
-     * Clear hint manager for current thread-local.
+     * Clear hint manager for current thread-local. 清理线索分片管理器的本地线程持有者
      */
     public static void clear() {
         HINT_MANAGER_HOLDER.remove();

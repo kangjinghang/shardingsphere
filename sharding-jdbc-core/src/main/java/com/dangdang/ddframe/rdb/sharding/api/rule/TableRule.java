@@ -33,26 +33,26 @@ import java.util.LinkedHashSet;
 import java.util.List;
 
 /**
- * Table rule configuration.
+ * Table rule configuration. 表规则配置对象
  * 
  * @author zhangliang
  */
 @Getter
 @ToString
 public final class TableRule {
-    
+    // 数据分片的逻辑表，对于水平拆分的数据库(表)，同一类表的总称
     private final String logicTable;
     
     private final boolean dynamic;
     
     private final List<DataNode> actualTables;
-    
+    // 分库策略
     private final DatabaseShardingStrategy databaseShardingStrategy;
-    
+    // 分表策略。当分库/分表策略不配置时，使用 ShardingRule 配置的分库/分表策略。
     private final TableShardingStrategy tableShardingStrategy;
-    
+    // 主键字段
     private final String generateKeyColumn;
-    
+    // 主键生成器。当主键生成器不配置时，使用 ShardingRule 配置的主键生成器。
     private final KeyGenerator keyGenerator;
     
     /**
@@ -80,13 +80,13 @@ public final class TableRule {
         this.dynamic = dynamic;
         this.databaseShardingStrategy = databaseShardingStrategy;
         this.tableShardingStrategy = tableShardingStrategy;
-        if (dynamic) {
+        if (dynamic) { // 动态表的分库分表数据单元
             Preconditions.checkNotNull(dataSourceRule);
             this.actualTables = generateDataNodes(dataSourceRule);
-        } else if (null == actualTables || actualTables.isEmpty()) {
+        } else if (null == actualTables || actualTables.isEmpty()) { // 静态表的分库分表数据单元。将 logicTable 作为 actualTable，即在库里不进行分表
             Preconditions.checkNotNull(dataSourceRule);
             this.actualTables = generateDataNodes(Collections.singletonList(logicTable), dataSourceRule, dataSourceNames);
-        } else {
+        } else { // 静态表的分库分表数据单元
             this.actualTables = generateDataNodes(actualTables, dataSourceRule, dataSourceNames);
         }
         this.generateKeyColumn = generateKeyColumn;
@@ -102,7 +102,7 @@ public final class TableRule {
     public static TableRuleBuilder builder(final String logicTable) {
         return new TableRuleBuilder(logicTable);
     }
-    
+    // 动态分库分表数据单元
     private List<DataNode> generateDataNodes(final DataSourceRule dataSourceRule) {
         Collection<String> dataSourceNames = dataSourceRule.getDataSourceNames();
         List<DataNode> result = new ArrayList<>(dataSourceNames.size());
@@ -111,14 +111,14 @@ public final class TableRule {
         }
         return result;
     }
-    
+    // 生成静态数据分片节点
     private List<DataNode> generateDataNodes(final List<String> actualTables, final DataSourceRule dataSourceRule, final Collection<String> actualDataSourceNames) {
         Collection<String> dataSourceNames = getDataSourceNames(dataSourceRule, actualDataSourceNames);
         List<DataNode> result = new ArrayList<>(actualTables.size() * (dataSourceNames.isEmpty() ? 1 : dataSourceNames.size()));
         for (String actualTable : actualTables) {
-            if (DataNode.isValidDataNode(actualTable)) {
+            if (DataNode.isValidDataNode(actualTable)) { // 自定义分布。当 actualTable 为 ${dataSourceName}.${tableName} 时，即已经明确真实表所在数据源。
                 result.add(new DataNode(actualTable));
-            } else {
+            } else { // 均匀分布。
                 for (String dataSourceName : dataSourceNames) {
                     result.add(new DataNode(dataSourceName, actualTable));
                 }
@@ -126,7 +126,7 @@ public final class TableRule {
         }
         return result;
     }
-    
+    // 根据 数据源配置对象 和 数据源名集合 获得 最终的数据源名集合
     private Collection<String> getDataSourceNames(final DataSourceRule dataSourceRule, final Collection<String> actualDataSourceNames) {
         if (null == dataSourceRule) {
             return Collections.emptyList();

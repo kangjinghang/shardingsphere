@@ -41,7 +41,7 @@ import java.util.Calendar;
  */
 @Setter
 public abstract class AbstractStreamResultSetMerger implements ResultSetMerger {
-    
+    // 当前结果集
     private ResultSet currentResultSet;
     
     private boolean wasNull;

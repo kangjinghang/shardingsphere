@@ -34,7 +34,7 @@ public final class ExecutorExceptionHandler {
     private static final ThreadLocal<Boolean> IS_EXCEPTION_THROWN = new ThreadLocal<>();
     
     /**
-     * Set throw exception if error occur or not.
+     * Set throw exception if error occur or not. 设置执行 SQL 错误时，也不抛出异常
      *
      * @param isExceptionThrown throw exception if error occur or not
      */

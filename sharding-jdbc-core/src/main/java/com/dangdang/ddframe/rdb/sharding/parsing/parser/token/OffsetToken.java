@@ -21,15 +21,15 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
- * Offset token for limit.
+ * Offset token for limit. 分页偏移量标记对象。只有在对应位置非占位符才有该 SQLToken。
  *
  * @author zhangliang
  */
 @RequiredArgsConstructor
 @Getter
 public final class OffsetToken implements SQLToken {
-    
+    //  SQL 所在开始位置
     private final int beginPosition;
-    
+    // 偏移值
     private final int offset;
 }

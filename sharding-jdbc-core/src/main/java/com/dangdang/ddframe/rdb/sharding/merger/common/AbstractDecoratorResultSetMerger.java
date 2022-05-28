@@ -33,7 +33,7 @@ import java.util.Calendar;
 @RequiredArgsConstructor
 @Getter
 public abstract class AbstractDecoratorResultSetMerger implements ResultSetMerger {
-    
+    // 装饰的归并对象
     private final ResultSetMerger resultSetMerger;
         
     @Override

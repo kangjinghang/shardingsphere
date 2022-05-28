@@ -24,7 +24,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 /**
- * Average aggregation unit.
+ * Average aggregation unit. 平均值聚合单元，解决 AVG 聚合列
  * 
  * @author gaohongtao
  */

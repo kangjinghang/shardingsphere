@@ -32,8 +32,8 @@ import lombok.ToString;
 @Setter
 @ToString
 public final class LimitValue {
-    
+    // 值。 当 value == -1 时，为占位符
     private int value;
-    
+    // 第几个占位符
     private int index;
 }

@@ -25,27 +25,27 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
- * Invocation that reflected call for JDBC method.
+ * Invocation that reflected call for JDBC method. 反射调用JDBC相关方法的工具类
  * 
  * @author gaohongtao
  */
 @RequiredArgsConstructor
 public class JdbcMethodInvocation {
-    
+    // 方法
     @Getter
     private final Method method;
-    
+    // 方法参数
     @Getter
     private final Object[] arguments;
     
     /**
-     * Invoke JDBC method.
+     * Invoke JDBC method. 调用方法
      * 
-     * @param target target object
+     * @param target target object 目标对象
      */
     public void invoke(final Object target) {
         try {
-            method.invoke(target, arguments);
+            method.invoke(target, arguments);  // 反射调用
         } catch (final IllegalAccessException | InvocationTargetException ex) {
             throw new ShardingJdbcException("Invoke jdbc method exception", ex);
         }

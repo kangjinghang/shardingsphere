@@ -23,7 +23,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
 /**
- * Table token.
+ * Table token. 表标记对象
  *
  * @author zhangliang
  */
@@ -31,15 +31,15 @@ import lombok.ToString;
 @Getter
 @ToString
 public final class TableToken implements SQLToken {
-    
+    // 开始位置
     private final int beginPosition;
-    
+    // 表达式
     private final String originalLiterals;
     
     /**
-     * Get table name.
+     * Get table name. 获取表名称
      * 
-     * @return table name
+     * @return table name 表名称
      */
     public String getTableName() {
         return SQLUtil.getExactlyValue(originalLiterals);

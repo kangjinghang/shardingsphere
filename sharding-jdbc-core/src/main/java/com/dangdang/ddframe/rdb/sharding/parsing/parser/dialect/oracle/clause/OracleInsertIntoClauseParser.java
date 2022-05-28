@@ -17,7 +17,7 @@ public final class OracleInsertIntoClauseParser extends InsertIntoClauseParser {
     public OracleInsertIntoClauseParser(final ShardingRule shardingRule, final LexerEngine lexerEngine) {
         super(lexerEngine, new OracleTableReferencesClauseParser(shardingRule, lexerEngine));
     }
-    
+    // Oracle，INSERT FIRST/ALL 目前不支持
     @Override
     protected Keyword[] getUnsupportedKeywordsBeforeInto() {
         return new Keyword[] {DefaultKeyword.ALL, OracleKeyword.FIRST};

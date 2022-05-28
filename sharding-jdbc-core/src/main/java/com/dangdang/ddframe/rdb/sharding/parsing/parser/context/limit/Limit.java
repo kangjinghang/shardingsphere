@@ -27,7 +27,7 @@ import lombok.ToString;
 import java.util.List;
 
 /**
- * Limit object.
+ * Limit object. 分页对象。属于分片上下文信息
  *
  * @author zhangliang
  * @author caohao
@@ -37,11 +37,11 @@ import java.util.List;
 @Setter
 @ToString
 public final class Limit {
-    
+    // 是否重写 rowCount
     private final boolean rowCountRewriteFlag;
-    
+    // offset
     private LimitValue offset;
-    
+    // row
     private LimitValue rowCount;
     
     /**
@@ -63,16 +63,16 @@ public final class Limit {
     }
     
     /**
-     * Fill parameters for rewrite limit.
+     * Fill parameters for rewrite limit. 填充改写分页参数
      *
-     * @param parameters parameters
-     * @param isFetchAll is fetch all data or not
+     * @param parameters parameters 参数
+     * @param isFetchAll is fetch all data or not 是否获取所有数据
      */
     public void processParameters(final List<Object> parameters, final boolean isFetchAll) {
         fill(parameters);
         rewrite(parameters, isFetchAll);
     }
-    
+    // 将占位符参数里是分页的参数赋值给 offset 、rowCount，赋值的前提条件是 offset、rowCount 是占位符
     private void fill(final List<Object> parameters) {
         int offset = 0;
         if (null != this.offset) {
@@ -88,18 +88,18 @@ public final class Limit {
             throw new SQLParsingException("LIMIT offset and row count can not be a negative value.");
         }
     }
-    
+    // 重写分页条件对应的参数
     private void rewrite(final List<Object> parameters, final boolean isFetchAll) {
         int rewriteOffset = 0;
         int rewriteRowCount;
-        if (isFetchAll) {
+        if (isFetchAll) { // 重写
             rewriteRowCount = Integer.MAX_VALUE;
         } else if (rowCountRewriteFlag) {
             rewriteRowCount = null == rowCount ? -1 : getOffsetValue() + rowCount.getValue();
         } else {
             rewriteRowCount = rowCount.getValue();
         }
-        if (null != offset && offset.getIndex() > -1) {
+        if (null != offset && offset.getIndex() > -1) { // 参数设置
             parameters.set(offset.getIndex(), rewriteOffset);
         }
         if (null != rowCount && rowCount.getIndex() > -1) {

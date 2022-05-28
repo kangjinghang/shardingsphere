@@ -30,7 +30,7 @@ import java.util.LinkedList;
 import java.util.Map;
 
 /**
- * Adapter for {@code Connection}.
+ * Adapter for {@code Connection}. 数据库连接适配类
  * 
  * @author zhangliang
  */
@@ -38,24 +38,24 @@ public abstract class AbstractConnectionAdapter extends AbstractUnsupportedOpera
     
     @Getter
     private final Map<String, Connection> cachedConnections = new HashMap<>();
-    
+    // 是否自动提交
     private boolean autoCommit = true;
-    
+    // 只读
     private boolean readOnly = true;
     
     private boolean closed;
-    
+    // 事务级别
     private int transactionIsolation = TRANSACTION_READ_UNCOMMITTED;
     
     @Override
     public final boolean getAutoCommit() throws SQLException {
         return autoCommit;
     }
-    
+    // 实际会设置其所持有的 Connection 的 autoCommit 属性
     @Override
     public final void setAutoCommit(final boolean autoCommit) throws SQLException {
         this.autoCommit = autoCommit;
-        if (cachedConnections.isEmpty()) {
+        if (cachedConnections.isEmpty()) { // 无数据连接时，记录方法调用
             recordMethodInvocation(Connection.class, "setAutoCommit", new Class[] {boolean.class}, new Object[] {autoCommit});
             return;
         }

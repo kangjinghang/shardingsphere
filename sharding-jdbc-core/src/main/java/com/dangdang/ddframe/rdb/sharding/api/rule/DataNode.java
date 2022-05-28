@@ -26,8 +26,8 @@ import lombok.ToString;
 import java.util.List;
 
 /**
- * Sharding data unit node.
- * 
+ * Sharding data unit node. 静态分库分表数据单元。数据分片的最小单元，由数据源名称和数据表组成。
+ * 例：ds_1.t_order_0。配置时默认各个分片数据库的表结构均相同，直接配置逻辑表和真实表对应关系即可。
  * @author zhangliang
  */
 @RequiredArgsConstructor

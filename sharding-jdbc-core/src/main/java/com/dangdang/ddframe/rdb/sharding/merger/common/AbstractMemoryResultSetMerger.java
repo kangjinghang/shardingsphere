@@ -40,7 +40,7 @@ import java.util.Map;
 public abstract class AbstractMemoryResultSetMerger implements ResultSetMerger {
     
     private final Map<String, Integer> labelAndIndexMap;
-    
+    // 内存数据行对象
     @Setter
     private MemoryResultSetRow currentResultSetRow;
     

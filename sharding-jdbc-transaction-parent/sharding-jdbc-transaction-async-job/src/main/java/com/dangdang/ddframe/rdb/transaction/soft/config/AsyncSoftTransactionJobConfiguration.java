@@ -21,7 +21,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * Asynchronized B.A.S.E transaction job configuration.
+ * Asynchronized B.A.S.E transaction job configuration. 异步柔性事务作业配置对象
  *
  * @author caohao
  */
@@ -30,27 +30,27 @@ import lombok.Setter;
 public class AsyncSoftTransactionJobConfiguration {
     
     /**
-     * Job name.
+     * Job name. 作业名称
      */
     private String name = "bestEffortsDeliveryJob";
     
     /**
-     * Cron expression for trigger job.
+     * Cron expression for trigger job. 触发作业的cron表达式
      */
     private String cron = "0/5 * * * * ?";
     
     /**
-     * Transaction logs fetch data count.
+     * Transaction logs fetch data count. 每次作业获取的事务日志最大数量
      */
     private int transactionLogFetchDataCount = 100;
     
     /**
-     * Max delivery try times.
+     * Max delivery try times. 事务送达的最大尝试次数
      */
     private int maxDeliveryTryTimes = 3;
     
     /**
-     * Delay millis for asynchronized delivery.
+     * Delay millis for asynchronized delivery. 执行事务的延迟毫秒数，早于此间隔时间的入库事务才会被作业执行
      */
     private long maxDeliveryTryDelayMillis = 60  * 1000L;
 }

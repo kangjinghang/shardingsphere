@@ -26,7 +26,7 @@ import com.dangdang.ddframe.rdb.sharding.parsing.parser.sql.SQLParserFactory;
 import lombok.RequiredArgsConstructor;
 
 /**
- * SQL parsing engine.
+ * SQL parsing engine. SQL 解析引擎
  *
  * @author zhangliang
  */
@@ -40,13 +40,13 @@ public final class SQLParsingEngine {
     private final ShardingRule shardingRule;
     
     /**
-     * Parse SQL.
+     * Parse SQL. SQL 解析入口
      * 
      * @return parsed SQL statement
      */
     public SQLStatement parse() {
         LexerEngine lexerEngine = LexerEngineFactory.newInstance(dbType, sql);
         lexerEngine.nextToken();
-        return SQLParserFactory.newInstance(dbType, lexerEngine.getCurrentToken().getType(), shardingRule, lexerEngine).parse();
+        return SQLParserFactory.newInstance(dbType, lexerEngine.getCurrentToken().getType(), shardingRule, lexerEngine).parse(); // 不同 SQL 解析后，返回对应的 SQL 结果，即 Statement
     }
 }

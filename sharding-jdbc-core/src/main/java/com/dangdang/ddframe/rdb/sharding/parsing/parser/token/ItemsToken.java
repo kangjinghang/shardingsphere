@@ -25,16 +25,16 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Select items token.
- *
+ * Select items token. 选择项标记对象。属于分片上下文信息，目前有 3 个情况会创建：1.AVG 查询额外 COUNT 和 SUM：#appendAvgDerivedColumns()
+ * 2.GROUP BY 不在 查询字段，额外查询该字段 ：#appendDerivedOrderColumns()  3.ORDER BY 不在 查询字段，额外查询该字段 ：#appendDerivedOrderColumns()
  * @author zhangliang
  */
 @RequiredArgsConstructor
 @Getter
 @ToString
 public final class ItemsToken implements SQLToken {
-    
+    // SQL 开始位置
     private final int beginPosition;
-    
+    // 字段名数组
     private final List<String> items = new LinkedList<>();
 }

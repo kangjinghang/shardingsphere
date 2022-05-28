@@ -33,32 +33,32 @@ import java.util.UUID;
  * @author zhangliang 
  */
 public abstract class AbstractSoftTransaction {
-    
+    // 分片连接原自动提交状态
     private boolean previousAutoCommit;
-    
+    // 分片连接
     @Getter
     private ShardingConnection connection;
-    
+    // 事务类型
     @Getter
     private SoftTransactionType transactionType;
-    
+    // 事务编号
     @Getter
     private String transactionId;
-    
+    // 开启柔性事务方法，提供给子类调用
     protected final void beginInternal(final Connection conn, final SoftTransactionType type) throws SQLException {
-        // TODO if in traditional transaction, then throw exception
+        // TODO if in traditional transaction, then throw exception 判断如果在传统事务中，则抛异常
         Preconditions.checkArgument(conn instanceof ShardingConnection, "Only ShardingConnection can support eventual consistency transaction.");
-        ExecutorExceptionHandler.setExceptionThrown(false);
+        ExecutorExceptionHandler.setExceptionThrown(false); // 设置执行错误，不抛出异常
         connection = (ShardingConnection) conn;
         transactionType = type;
-        previousAutoCommit = connection.getAutoCommit();
-        connection.setAutoCommit(true);
-        // TODO replace to snowflake
+        previousAutoCommit = connection.getAutoCommit(); // 设置自动提交状态
+        connection.setAutoCommit(true); // 设置执行自动提交，使用最大努力型事务时，上层业务执行 SQL 会马上提交，即使调用 Connection#rollback() 也是无法回滚的
+        // TODO replace to snowflake 生成事务编号
         transactionId = UUID.randomUUID().toString();
     }
     
     /**
-     * End transaction.
+     * End transaction. 结束柔性事务方法，提供给子类调用
      * 
      * @throws SQLException SQL exception
      */

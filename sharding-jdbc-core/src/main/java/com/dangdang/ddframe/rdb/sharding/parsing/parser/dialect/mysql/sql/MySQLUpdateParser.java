@@ -34,7 +34,7 @@ public final class MySQLUpdateParser extends AbstractUpdateParser {
     public MySQLUpdateParser(final ShardingRule shardingRule, final LexerEngine lexerEngine) {
         super(shardingRule, lexerEngine, new MySQLUpdateClauseParserFacade(shardingRule, lexerEngine));
     }
-    
+    // MYSQL：LOW_PRIORITY、IGNORE
     @Override
     protected Keyword[] getSkippedKeywordsBetweenUpdateAndTable() {
         return new Keyword[] {MySQLKeyword.LOW_PRIORITY, MySQLKeyword.IGNORE};

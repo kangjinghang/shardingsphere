@@ -61,14 +61,14 @@ public class WhereClauseParser implements SQLClauseParser {
             parseConditions(shardingRule, sqlStatement, items);
         }
     }
-    
+    // 解析所有查询条件。目前不支持 OR 条件。
     private void parseConditions(final ShardingRule shardingRule, final SQLStatement sqlStatement, final List<SelectItem> items) {
         do {
             parseComparisonCondition(shardingRule, sqlStatement, items);
-        } while (lexerEngine.skipIfEqual(DefaultKeyword.AND));
-        lexerEngine.unsupportedIfEqual(DefaultKeyword.OR);
+        } while (lexerEngine.skipIfEqual(DefaultKeyword.AND)); // AND 查询
+        lexerEngine.unsupportedIfEqual(DefaultKeyword.OR); // 不支持 OR 条件
     }
-    
+    // 解析单个查询条件
     private void parseComparisonCondition(final ShardingRule shardingRule, final SQLStatement sqlStatement, final List<SelectItem> items) {
         lexerEngine.skipIfEqual(Symbol.LEFT_PAREN);
         SQLExpression left = expressionClauseParser.parse(sqlStatement);
@@ -111,11 +111,11 @@ public class WhereClauseParser implements SQLClauseParser {
         }
         lexerEngine.skipIfEqual(Symbol.RIGHT_PAREN);
     }
-    
+    // 解析 = 条件
     private void parseEqualCondition(final ShardingRule shardingRule, final SQLStatement sqlStatement, final SQLExpression left) {
         SQLExpression right = expressionClauseParser.parse(sqlStatement);
         // TODO if have more tables, and cannot find column belong to, should not add to condition, should parse binding table rule.
-        if ((sqlStatement.getTables().isSingleTable() || left instanceof SQLPropertyExpression)
+        if ((sqlStatement.getTables().isSingleTable() || left instanceof SQLPropertyExpression) // 添加列
                 && (right instanceof SQLNumberExpression || right instanceof SQLTextExpression || right instanceof SQLPlaceholderExpression)) {
             Optional<Column> column = find(sqlStatement.getTables(), left);
             if (column.isPresent()) {

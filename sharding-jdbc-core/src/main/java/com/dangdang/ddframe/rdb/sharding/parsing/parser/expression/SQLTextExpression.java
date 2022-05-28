@@ -21,7 +21,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
- * Text expression.
+ * Text expression. 字符表达式。对应Token：Literals.CHARS
  *
  * @author zhangliang
  */

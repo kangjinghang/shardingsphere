@@ -39,7 +39,7 @@ public class GroupByClauseParser implements SQLClauseParser {
             return;
         }
         lexerEngine.accept(DefaultKeyword.BY);
-        while (true) {
+        while (true) {  // 解析 Group By 每个字段
             addGroupByItem(expressionClauseParser.parse(selectStatement), selectStatement);
             if (!lexerEngine.equalAny(Symbol.COMMA)) {
                 break;
@@ -49,16 +49,16 @@ public class GroupByClauseParser implements SQLClauseParser {
         lexerEngine.skipAll(getSkippedKeywordAfterGroupBy());
         selectStatement.setGroupByLastPosition(lexerEngine.getCurrentToken().getEndPosition() - lexerEngine.getCurrentToken().getLiterals().length());
     }
-    
+    // 解析 Group By 单个字段。Group By 条件是带有排序功能，默认ASC
     private void addGroupByItem(final SQLExpression sqlExpression, final SelectStatement selectStatement) {
         lexerEngine.unsupportedIfEqual(getUnsupportedKeywordBeforeGroupByItem());
-        OrderType orderByType = OrderType.ASC;
+        OrderType orderByType = OrderType.ASC; // Group By 字段 DESC / ASC / ;默认是 ASC。
         if (lexerEngine.equalAny(DefaultKeyword.ASC)) {
             lexerEngine.nextToken();
         } else if (lexerEngine.skipIfEqual(DefaultKeyword.DESC)) {
             orderByType = OrderType.DESC;
         }
-        OrderItem orderItem;
+        OrderItem orderItem; // 解析 OrderItem
         if (sqlExpression instanceof SQLPropertyExpression) {
             SQLPropertyExpression sqlPropertyExpression = (SQLPropertyExpression) sqlExpression;
             orderItem = new OrderItem(SQLUtil.getExactlyValue(sqlPropertyExpression.getOwner().getName()), SQLUtil.getExactlyValue(sqlPropertyExpression.getName()), orderByType, OrderType.ASC,

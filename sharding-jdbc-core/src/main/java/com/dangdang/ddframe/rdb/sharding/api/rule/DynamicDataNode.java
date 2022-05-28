@@ -18,8 +18,8 @@
 package com.dangdang.ddframe.rdb.sharding.api.rule;
 
 /**
- * Dynamic Sharding data unit node.
- * 
+ * Dynamic Sharding data unit node. 动态表的分库分表数据单元。逻辑表和真实表不一定需要在配置规则中静态配置。
+ * 比如按照日期分片的场景，真实表的名称随着时间的推移会产生变化。
  * <p>Dynamic data node do not need configure actual tables, it will get actual tables depended on sharding algorithm.</p>
  * 
  * @author zhangliang

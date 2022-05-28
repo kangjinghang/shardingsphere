@@ -31,7 +31,7 @@ import java.util.Collection;
 import java.util.logging.Logger;
 
 /**
- * Adapter for {@code Datasource}.
+ * Adapter for {@code Datasource}. 数据源适配类
  * 
  * @author zhangliang
  */

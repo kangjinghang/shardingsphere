@@ -111,21 +111,21 @@ public final class ShardingPreparedStatement extends AbstractShardingPreparedSta
     public ResultSet executeQuery() throws SQLException {
         ResultSet result;
         try {
-            Collection<PreparedStatementUnit> preparedStatementUnits = route();
-            List<ResultSet> resultSets = new PreparedStatementExecutor(
+            Collection<PreparedStatementUnit> preparedStatementUnits = route();  // 路由
+            List<ResultSet> resultSets = new PreparedStatementExecutor( // 执行
                     getConnection().getShardingContext().getExecutorEngine(), routeResult.getSqlStatement().getType(), preparedStatementUnits, getParameters()).executeQuery();
-            result = new ShardingResultSet(resultSets, new MergeEngine(resultSets, (SelectStatement) routeResult.getSqlStatement()).merge());
+            result = new ShardingResultSet(resultSets, new MergeEngine(resultSets, (SelectStatement) routeResult.getSqlStatement()).merge());  // 结果归并
         } finally {
             clearBatch();
         }
-        currentResultSet = result;
+        currentResultSet = result;  // 设置结果集
         return result;
     }
     
     @Override
     public int executeUpdate() throws SQLException {
         try {
-            Collection<PreparedStatementUnit> preparedStatementUnits = route();
+            Collection<PreparedStatementUnit> preparedStatementUnits = route(); // 分库分表路由，获得预编译语句对象执行单元( PreparedStatementUnit )集合
             return new PreparedStatementExecutor(
                     getConnection().getShardingContext().getExecutorEngine(), routeResult.getSqlStatement().getType(), preparedStatementUnits, getParameters()).executeUpdate();
         } finally {
@@ -146,24 +146,24 @@ public final class ShardingPreparedStatement extends AbstractShardingPreparedSta
     
     private Collection<PreparedStatementUnit> route() throws SQLException {
         Collection<PreparedStatementUnit> result = new LinkedList<>();
-        routeResult = routingEngine.route(getParameters());
-        for (SQLExecutionUnit each : routeResult.getExecutionUnits()) {
+        routeResult = routingEngine.route(getParameters()); // 路由
+        for (SQLExecutionUnit each : routeResult.getExecutionUnits()) { // 遍历 SQL 执行单元
             SQLType sqlType = routeResult.getSqlStatement().getType();
             Collection<PreparedStatement> preparedStatements;
-            if (SQLType.DDL == sqlType) {
+            if (SQLType.DDL == sqlType) { // 创建实际的 PreparedStatement
                 preparedStatements = generatePreparedStatementForDDL(each);
             } else {
                 preparedStatements = Collections.singletonList(generatePreparedStatement(each));
             }
             routedStatements.addAll(preparedStatements);
-            for (PreparedStatement preparedStatement : preparedStatements) {
+            for (PreparedStatement preparedStatement : preparedStatements) { // 回放设置占位符参数到 PreparedStatement
                 replaySetParameter(preparedStatement);
                 result.add(new PreparedStatementUnit(each, preparedStatement));
             }
         }
         return result;
     }
-    
+    // 创建 PreparedStatement
     private Collection<PreparedStatement> generatePreparedStatementForDDL(final SQLExecutionUnit sqlExecutionUnit) throws SQLException {
         Collection<PreparedStatement> result = new LinkedList<>();
         Collection<Connection> connections = getConnection().getAllConnections(sqlExecutionUnit.getDataSource());
@@ -172,10 +172,10 @@ public final class ShardingPreparedStatement extends AbstractShardingPreparedSta
         }
         return result;
     }
-    
+    // 创建 PreparedStatement
     private PreparedStatement generatePreparedStatement(final SQLExecutionUnit sqlExecutionUnit) throws SQLException {
-        Connection connection = getConnection().getConnection(sqlExecutionUnit.getDataSource(), routeResult.getSqlStatement().getType());
-        return returnGeneratedKeys ? connection.prepareStatement(sqlExecutionUnit.getSql(), RETURN_GENERATED_KEYS)
+        Connection connection = getConnection().getConnection(sqlExecutionUnit.getDataSource(), routeResult.getSqlStatement().getType());  // 获得连接
+        return returnGeneratedKeys ? connection.prepareStatement(sqlExecutionUnit.getSql(), RETURN_GENERATED_KEYS)  // 声明返回主键
                 : connection.prepareStatement(sqlExecutionUnit.getSql(), resultSetType, resultSetConcurrency, resultSetHoldability);
     }
     

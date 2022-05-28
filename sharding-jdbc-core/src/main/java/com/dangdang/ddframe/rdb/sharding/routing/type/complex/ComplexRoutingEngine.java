@@ -37,7 +37,7 @@ import java.util.List;
 import java.util.TreeSet;
 
 /**
- * Complex routing engine.
+ * Complex routing engine. 混合多库表路由引擎，根据路由结果会转化成 SimpleRoutingEngine 或 ComplexRoutingEngine
  * 
  * @author gaohongtao
  * @author zhangliang
@@ -58,13 +58,13 @@ public final class ComplexRoutingEngine implements RoutingEngine {
     public RoutingResult route() {
         Collection<RoutingResult> result = new ArrayList<>(logicTables.size());
         Collection<String> bindingTableNames = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
-        for (String each : logicTables) {
+        for (String each : logicTables) { // 计算每个逻辑表的简单路由分片
             Optional<TableRule> tableRule = shardingRule.tryFindTableRule(each);
             if (tableRule.isPresent()) {
                 if (!bindingTableNames.contains(each)) {
                     result.add(new SimpleRoutingEngine(shardingRule, parameters, tableRule.get().getLogicTable(), sqlStatement).route());
                 }
-                Optional<BindingTableRule> bindingTableRule = shardingRule.findBindingTableRule(each);
+                Optional<BindingTableRule> bindingTableRule = shardingRule.findBindingTableRule(each); // 互为 BindingTable 关系的表加到 bindingTableNames 里，不重复计算分片
                 if (bindingTableRule.isPresent()) {
                     bindingTableNames.addAll(Lists.transform(bindingTableRule.get().getTableRules(), new Function<TableRule, String>() {
                         
@@ -80,9 +80,9 @@ public final class ComplexRoutingEngine implements RoutingEngine {
         if (result.isEmpty()) {
             throw new ShardingJdbcException("Cannot find table rule and default data source with logic tables: '%s'", logicTables);
         }
-        if (1 == result.size()) {
+        if (1 == result.size()) { // 防御性编程。shardingRule#isAllBindingTables() 已经过滤了这个情况。
             return result.iterator().next();
         }
-        return new CartesianRoutingEngine(result).route();
+        return new CartesianRoutingEngine(result).route();  // 交给 CartesianRoutingEngine 形成笛卡尔积结果
     }
 }

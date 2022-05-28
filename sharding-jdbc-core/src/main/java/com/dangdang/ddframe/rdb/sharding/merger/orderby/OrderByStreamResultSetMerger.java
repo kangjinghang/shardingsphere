@@ -29,23 +29,23 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 
 /**
- * Stream merger for order by.
+ * Stream merger for order by. 基于 Stream 方式排序归并结果集实现
  *
  * @author zhangliang
  */
 @Getter(AccessLevel.PROTECTED)
 public class OrderByStreamResultSetMerger extends AbstractStreamResultSetMerger {
-    
+    // 排序列
     @Getter(AccessLevel.NONE)
     private final List<OrderItem> orderByItems;
-    
+    // 排序值对象队列
     private final Queue<OrderByValue> orderByValuesQueue;
-    
+    // 是否第一个 ResultSet 已经调用 #next()
     private boolean isFirstNext;
     
     public OrderByStreamResultSetMerger(final List<ResultSet> resultSets, final List<OrderItem> orderByItems) throws SQLException {
         this.orderByItems = orderByItems;
-        this.orderByValuesQueue = new PriorityQueue<>(resultSets.size());
+        this.orderByValuesQueue = new PriorityQueue<>(resultSets.size()); // 优先级队列
         orderResultSetsToQueue(resultSets);
         isFirstNext = true;
     }
@@ -57,7 +57,7 @@ public class OrderByStreamResultSetMerger extends AbstractStreamResultSetMerger 
                 orderByValuesQueue.offer(orderByValue);
             }
         }
-        setCurrentResultSet(orderByValuesQueue.isEmpty() ? resultSets.get(0) : orderByValuesQueue.peek().getResultSet());
+        setCurrentResultSet(orderByValuesQueue.isEmpty() ? resultSets.get(0) : orderByValuesQueue.peek().getResultSet()); // 设置当前 ResultSet，这样 #getValue() 能拿到记录
     }
     
     @Override
@@ -69,14 +69,14 @@ public class OrderByStreamResultSetMerger extends AbstractStreamResultSetMerger 
             isFirstNext = false;
             return true;
         }
-        OrderByValue firstOrderByValue = orderByValuesQueue.poll();
-        if (firstOrderByValue.next()) {
+        OrderByValue firstOrderByValue = orderByValuesQueue.poll(); // 移除上一次获得的 ResultSet
+        if (firstOrderByValue.next()) {  // 如果上一次获得的 ResultSet还有下一条记录，继续添加到 排序值对象队列
             orderByValuesQueue.offer(firstOrderByValue);
         }
         if (orderByValuesQueue.isEmpty()) {
             return false;
         }
-        setCurrentResultSet(orderByValuesQueue.peek().getResultSet());
+        setCurrentResultSet(orderByValuesQueue.peek().getResultSet()); // 设置当前 ResultSet
         return true;
     }
 }

@@ -26,24 +26,24 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * SQL execution event.
+ * SQL execution event. SQL 执行事件抽象接口
  *
  * @author zhangliang
  */
 @Getter
 @Setter
 public abstract class AbstractExecutionEvent {
-    
+    // 事件编号
     private final String id;
-    
+    // 数据源
     private final String dataSource;
-    
+    // SQL
     private final String sql;
-    
+    // 参数
     private final List<Object> parameters;
-    
+    // 事件类型
     private EventExecutionType eventExecutionType;
-    
+    // 异常
     private Optional<SQLException> exception;
     
     public AbstractExecutionEvent(final String dataSource, final String sql, final List<Object> parameters) {

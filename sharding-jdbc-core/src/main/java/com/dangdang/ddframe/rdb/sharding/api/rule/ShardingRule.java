@@ -40,7 +40,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Databases and tables sharding rule configuration.
+ * Databases and tables sharding rule configuration. 分库分表规则配置对象，内嵌 ShardingRuleBuilder 对象进行创建。
  * 
  * @author zhangliang
  */
@@ -48,18 +48,18 @@ import java.util.Map;
 public final class ShardingRule {
     
     private final DataSourceRule dataSourceRule;
-    
+    // 表规则配置对象集合
     private final Collection<TableRule> tableRules;
-    
+    // 指在任何场景下分片规则均一致的主表和子表。例：订单表和订单项表，均按照订单ID分片，则此两张表互为BindingTable关系。BindingTable关系的多表关联查询不会出现笛卡尔积关联，关联查询效率将大大提升。
     private final Collection<BindingTableRule> bindingTableRules;
-    
+    // 和 TableRule 属性重复，用于当 TableRule 未配置对应属性，使用 ShardingRule 提供的该属性。
     private final DatabaseShardingStrategy databaseShardingStrategy;
-    
+    // 和 TableRule 属性重复，用于当 TableRule 未配置对应属性，使用 ShardingRule 提供的该属性。
     private final TableShardingStrategy tableShardingStrategy;
-    
+    // 和 TableRule 属性重复，用于当 TableRule 未配置对应属性，使用 ShardingRule 提供的该属性。
     @Getter(AccessLevel.NONE)
     private final KeyGenerator keyGenerator;
-    
+    // 和 TableRule 属性重复，用于当 TableRule 未配置对应属性，使用 ShardingRule 提供的该属性。
     @Getter(AccessLevel.NONE)
     private final KeyGenerator defaultGenerator;
     
@@ -85,9 +85,9 @@ public final class ShardingRule {
         this.tableRules = null == tableRules ? Collections.<TableRule>emptyList() : tableRules;
         this.bindingTableRules = null == bindingTableRules ? Collections.<BindingTableRule>emptyList() : bindingTableRules;
         this.databaseShardingStrategy = null == databaseShardingStrategy ? new DatabaseShardingStrategy(
-                Collections.<String>emptyList(), new NoneDatabaseShardingAlgorithm()) : databaseShardingStrategy;
+                Collections.<String>emptyList(), new NoneDatabaseShardingAlgorithm()) : databaseShardingStrategy; // 在未设置分库算法的默认值
         this.tableShardingStrategy = null == tableShardingStrategy ? new TableShardingStrategy(
-                Collections.<String>emptyList(), new NoneTableShardingAlgorithm()) : tableShardingStrategy;
+                Collections.<String>emptyList(), new NoneTableShardingAlgorithm()) : tableShardingStrategy; // 在未设置分表算法的默认值
         this.keyGenerator = keyGenerator;
         defaultGenerator = KeyGeneratorFactory.createKeyGenerator(DefaultKeyGenerator.class);
     }
@@ -171,9 +171,9 @@ public final class ShardingRule {
     }
     
     /**
-     * Adjust logic tables is all belong to binding tables.
+     * Adjust logic tables is all belong to binding tables. 判断逻辑表名称集合是否全部属于 Binding 表
      *
-     * @param logicTables names of logic tables
+     * @param logicTables names of logic tables 逻辑表名称集合
      * @return logic tables is all belong to binding tables or not
      */
     public boolean isAllBindingTables(final Collection<String> logicTables) {
@@ -197,7 +197,7 @@ public final class ShardingRule {
     }
     
     /**
-     * Filter all binding tables.
+     * Filter all binding tables. 过滤出所有的 Binding 表名称
      * 
      * @param logicTables names of logic tables
      * @return names for filtered binding tables
@@ -211,10 +211,10 @@ public final class ShardingRule {
             return Collections.emptyList();
         }
         Collection<String> result = new ArrayList<>(bindingTableRule.get().getAllLogicTables());
-        result.retainAll(logicTables);
+        result.retainAll(logicTables);  // 交集
         return result;
     }
-    
+    // 获得包含任一在逻辑表名称集合的 binding 表配置的逻辑表名称集合
     private Optional<BindingTableRule> findBindingTableRule(final Collection<String> logicTables) {
         for (String each : logicTables) {
             Optional<BindingTableRule> result = findBindingTableRule(each);
@@ -226,7 +226,7 @@ public final class ShardingRule {
     }
     
     /**
-     * Get binding table rule via logic table name.
+     * Get binding table rule via logic table name. 根据逻辑表名称获取binding表配置的逻辑表名称集合
      *
      * @param logicTable logic table name
      * @return binding table rule

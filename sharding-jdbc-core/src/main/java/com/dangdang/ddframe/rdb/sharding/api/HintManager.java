@@ -39,7 +39,7 @@ import java.util.Map;
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class HintManager implements AutoCloseable {
-    
+    // 库分片值集合
     private final Map<ShardingKey, ShardingValue<?>> databaseShardingValues = new HashMap<>();
     
     private final Map<ShardingKey, ShardingValue<?>> tableShardingValues = new HashMap<>();
@@ -49,12 +49,12 @@ public final class HintManager implements AutoCloseable {
     
     @Getter
     private boolean masterRouteOnly;
-    
+    // 只做库分片
     @Getter
     private boolean databaseShardingOnly;
     
     /**
-     * Get a new instance for {@code HintManager}.
+     * Get a new instance for {@code HintManager}. 获取线索分片管理器实例
      *
      * @return  {@code HintManager} instance
      */
@@ -65,9 +65,9 @@ public final class HintManager implements AutoCloseable {
     }
     
     /**
-     * Set sharding value for database sharding only.
+     * Set sharding value for database sharding only. 设置分库分片值
      *
-     * <p>The sharding operator is {@code =}</p>
+     * <p>The sharding operator is {@code =}</p> 分片操作符为等号.该方法适用于只分库的场景
      *
      * @param value sharding value
      */

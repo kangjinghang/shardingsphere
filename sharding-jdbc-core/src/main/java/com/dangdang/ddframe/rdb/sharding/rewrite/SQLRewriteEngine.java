@@ -74,9 +74,9 @@ public final class SQLRewriteEngine {
     }
     
     /**
-     * rewrite SQL.
+     * rewrite SQL. SQL改写
      *
-     * @param isRewriteLimit is rewrite limit
+     * @param isRewriteLimit is rewrite limit 是否重写Limit
      * @return SQL builder
      */
     public SQLBuilder rewrite(final boolean isRewriteLimit) {
@@ -86,12 +86,12 @@ public final class SQLRewriteEngine {
             return result;
         }
         int count = 0;
-        sortByBeginPosition();
+        sortByBeginPosition(); // 排序SQLToken，按照 beginPosition 递增
         for (SQLToken each : sqlTokens) {
             if (0 == count) {
                 result.appendLiterals(originalSQL.substring(0, each.getBeginPosition()));
             }
-            if (each instanceof TableToken) {
+            if (each instanceof TableToken) { // 拼接每个 SQLToken
                 appendTableToken(result, (TableToken) each, count, sqlTokens);
             } else if (each instanceof ItemsToken) {
                 appendItemsToken(result, (ItemsToken) each, count, sqlTokens);
@@ -116,47 +116,47 @@ public final class SQLRewriteEngine {
             }
         });
     }
-    
+    // 拼接 TableToken
     private void appendTableToken(final SQLBuilder sqlBuilder, final TableToken tableToken, final int count, final List<SQLToken> sqlTokens) {
-        String tableName = sqlStatement.getTables().getTableNames().contains(tableToken.getTableName()) ? tableToken.getTableName() : tableToken.getOriginalLiterals();
+        String tableName = sqlStatement.getTables().getTableNames().contains(tableToken.getTableName()) ? tableToken.getTableName() : tableToken.getOriginalLiterals(); // 拼接 TableToken
         sqlBuilder.appendTable(tableName);
-        int beginPosition = tableToken.getBeginPosition() + tableToken.getOriginalLiterals().length();
+        int beginPosition = tableToken.getBeginPosition() + tableToken.getOriginalLiterals().length(); // 拼接 SQLToken 后面的字符串
         appendRest(sqlBuilder, count, sqlTokens, beginPosition);
     }
-    
+    // 拼接 TableToken
     private void appendItemsToken(final SQLBuilder sqlBuilder, final ItemsToken itemsToken, final int count, final List<SQLToken> sqlTokens) {
-        for (String item : itemsToken.getItems()) {
+        for (String item : itemsToken.getItems()) { // 拼接 ItemsToken
             sqlBuilder.appendLiterals(", ");
             sqlBuilder.appendLiterals(item);
         }
-        int beginPosition = itemsToken.getBeginPosition();
+        int beginPosition = itemsToken.getBeginPosition(); // SQLToken 后面的字符串
         appendRest(sqlBuilder, count, sqlTokens, beginPosition);
     }
     
     private void appendLimitRowCount(final SQLBuilder sqlBuilder, final RowCountToken rowCountToken, final int count, final List<SQLToken> sqlTokens, final boolean isRewrite) {
         SelectStatement selectStatement = (SelectStatement) sqlStatement;
         Limit limit = selectStatement.getLimit();
-        if (!isRewrite) {
+        if (!isRewrite) {  // 路由结果为单分片
             sqlBuilder.appendLiterals(String.valueOf(rowCountToken.getRowCount()));
         } else if ((!selectStatement.getGroupByItems().isEmpty() || !selectStatement.getAggregationSelectItems().isEmpty()) && !selectStatement.isSameGroupByAndOrderByItems()) {
             sqlBuilder.appendLiterals(String.valueOf(Integer.MAX_VALUE));
-        } else {
+        } else {  // 路由结果为多分片
             sqlBuilder.appendLiterals(String.valueOf(limit.isRowCountRewriteFlag() ? rowCountToken.getRowCount() + limit.getOffsetValue() : rowCountToken.getRowCount()));
         }
-        int beginPosition = rowCountToken.getBeginPosition() + String.valueOf(rowCountToken.getRowCount()).length();
+        int beginPosition = rowCountToken.getBeginPosition() + String.valueOf(rowCountToken.getRowCount()).length(); // SQLToken 后面的字符串
         appendRest(sqlBuilder, count, sqlTokens, beginPosition);
     }
-    
+    // 拼接 OffsetToken
     private void appendLimitOffsetToken(final SQLBuilder sqlBuilder, final OffsetToken offsetToken, final int count, final List<SQLToken> sqlTokens, final boolean isRewrite) {
-        sqlBuilder.appendLiterals(isRewrite ? "0" : String.valueOf(offsetToken.getOffset()));
-        int beginPosition = offsetToken.getBeginPosition() + String.valueOf(offsetToken.getOffset()).length();
+        sqlBuilder.appendLiterals(isRewrite ? "0" : String.valueOf(offsetToken.getOffset())); // 拼接 OffsetToken
+        int beginPosition = offsetToken.getBeginPosition() + String.valueOf(offsetToken.getOffset()).length(); // SQLToken 后面的字符串
         appendRest(sqlBuilder, count, sqlTokens, beginPosition);
     }
-    
+    // 拼接 OrderByToken
     private void appendOrderByToken(final SQLBuilder sqlBuilder, final int count, final List<SQLToken> sqlTokens) {
         SelectStatement selectStatement = (SelectStatement) sqlStatement;
         StringBuilder orderByLiterals = new StringBuilder();
-        orderByLiterals.append(" ").append(DefaultKeyword.ORDER).append(" ").append(DefaultKeyword.BY).append(" ");
+        orderByLiterals.append(" ").append(DefaultKeyword.ORDER).append(" ").append(DefaultKeyword.BY).append(" "); // 拼接 OrderByToken
         int i = 0;
         for (OrderItem each : selectStatement.getOrderByItems()) {
             if (0 == i) {
@@ -189,20 +189,20 @@ public final class SQLRewriteEngine {
     }
     
     /**
-     * Generate SQL string.
+     * Generate SQL string. 生成SQL语句。对于笛卡尔积路由结果和简单路由结果两种情况，处理上大体是一致的：1. 获得 SQL 相关逻辑表对应的真实表映射，2. 根据映射改写 SQL 相关逻辑表为真实表。
      *
-     * @param cartesianTableReference cartesian table reference
-     * @param sqlBuilder SQL builder
-     * @return SQL string
+     * @param cartesianTableReference cartesian table reference 笛卡尔积路由表单元
+     * @param sqlBuilder SQL builder SQL构建器
+     * @return SQL string SQL语句
      */
     public String generateSQL(final CartesianTableReference cartesianTableReference, final SQLBuilder sqlBuilder) {
         return sqlBuilder.toSQL(getTableTokens(cartesianTableReference));
     }
-    
+    // 获得（笛卡尔积表路由组里的路由表单元逻辑表 和 与其互为BindingTable关系的逻辑表）对应的真实表映射（逻辑表需要在 SQL 中存在）
     private Map<String, String> getTableTokens(final TableUnit tableUnit) {
         Map<String, String> tableTokens = new HashMap<>();
         tableTokens.put(tableUnit.getLogicTableName(), tableUnit.getActualTableName());
-        Optional<BindingTableRule> bindingTableRule = shardingRule.findBindingTableRule(tableUnit.getLogicTableName());
+        Optional<BindingTableRule> bindingTableRule = shardingRule.findBindingTableRule(tableUnit.getLogicTableName()); // 查找 BindingTableRule
         if (bindingTableRule.isPresent()) {
             tableTokens.putAll(getBindingTableTokens(tableUnit, bindingTableRule.get()));
         }
@@ -220,7 +220,7 @@ public final class SQLRewriteEngine {
         }
         return tableTokens;
     }
-    
+    // 获得 BindingTable 关系的逻辑表对应的真实表映射（逻辑表需要在 SQL 中存在）
     private Map<String, String> getBindingTableTokens(final TableUnit tableUnit, final BindingTableRule bindingTableRule) {
         Map<String, String> result = new HashMap<>();
         for (String eachTable : sqlStatement.getTables().getTableNames()) {

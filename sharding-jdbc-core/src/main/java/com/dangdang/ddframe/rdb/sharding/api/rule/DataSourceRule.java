@@ -27,7 +27,7 @@ import java.util.Collection;
 import java.util.Map;
 
 /**
- * Data source rule configuration.
+ * Data source rule configuration. 数据源配置对象
  * 
  * @author zhangliang
  */

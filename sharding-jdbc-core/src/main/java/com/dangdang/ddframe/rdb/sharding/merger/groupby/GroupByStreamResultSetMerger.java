@@ -41,13 +41,13 @@ import java.util.Map.Entry;
  * @author zhangliang
  */
 public final class GroupByStreamResultSetMerger extends OrderByStreamResultSetMerger {
-    
+    // 查询列名与位置映射
     private final Map<String, Integer> labelAndIndexMap;
-    
+    //  Select SQL语句对象
     private final SelectStatement selectStatement;
-    
+    // 当前结果记录
     private final List<Object> currentRow;
-    
+    // 下一条结果记录 GROUP BY 条件
     private List<?> currentGroupByValues;
     
     public GroupByStreamResultSetMerger(
@@ -56,20 +56,20 @@ public final class GroupByStreamResultSetMerger extends OrderByStreamResultSetMe
         this.labelAndIndexMap = labelAndIndexMap;
         this.selectStatement = selectStatement;
         currentRow = new ArrayList<>(labelAndIndexMap.size());
-        currentGroupByValues = getOrderByValuesQueue().isEmpty() ? Collections.emptyList() : new GroupByValue(getCurrentResultSet(), selectStatement.getGroupByItems()).getGroupValues();
+        currentGroupByValues = getOrderByValuesQueue().isEmpty() ? Collections.emptyList() : new GroupByValue(getCurrentResultSet(), selectStatement.getGroupByItems()).getGroupValues(); // 初始化下一条结果记录 GROUP BY 条件
     }
     
     @Override
     public boolean next() throws SQLException {
-        currentRow.clear();
+        currentRow.clear(); // 清除当前结果记录
         if (getOrderByValuesQueue().isEmpty()) {
             return false;
         }
         if (isFirstNext()) {
             super.next();
         }
-        if (aggregateCurrentGroupByRowAndNext()) {
-            currentGroupByValues = new GroupByValue(getCurrentResultSet(), selectStatement.getGroupByItems()).getGroupValues();
+        if (aggregateCurrentGroupByRowAndNext()) { // 顺序合并下面相同分组条件的记录
+            currentGroupByValues = new GroupByValue(getCurrentResultSet(), selectStatement.getGroupByItems()).getGroupValues(); // 生成下一条结果记录 GROUP BY 条件
         }
         return true;
     }
@@ -82,26 +82,26 @@ public final class GroupByStreamResultSetMerger extends OrderByStreamResultSetMe
             public AggregationUnit apply(final AggregationSelectItem input) {
                 return AggregationUnitFactory.create(input.getType());
             }
-        });
-        while (currentGroupByValues.equals(new GroupByValue(getCurrentResultSet(), selectStatement.getGroupByItems()).getGroupValues())) {
-            aggregate(aggregationUnitMap);
-            cacheCurrentRow();
-            result = super.next();
+        });  // 生成计算单元
+        while (currentGroupByValues.equals(new GroupByValue(getCurrentResultSet(), selectStatement.getGroupByItems()).getGroupValues())) { // 循环顺序合并下面相同分组条件的记录
+            aggregate(aggregationUnitMap); // 归并聚合值
+            cacheCurrentRow(); // 缓存当前记录到结果记录
+            result = super.next(); // 获取下一条记录
             if (!result) {
                 break;
             }
         }
-        setAggregationValueToCurrentRow(aggregationUnitMap);
+        setAggregationValueToCurrentRow(aggregationUnitMap); // 设置当前记录的聚合字段结果
         return result;
     }
     
     private void aggregate(final Map<AggregationSelectItem, AggregationUnit> aggregationUnitMap) throws SQLException {
         for (Entry<AggregationSelectItem, AggregationUnit> entry : aggregationUnitMap.entrySet()) {
             List<Comparable<?>> values = new ArrayList<>(2);
-            if (entry.getKey().getDerivedAggregationSelectItems().isEmpty()) {
+            if (entry.getKey().getDerivedAggregationSelectItems().isEmpty()) {  // SUM/COUNT/MAX/MIN 聚合列
                 values.add(getAggregationValue(entry.getKey()));
             } else {
-                for (AggregationSelectItem each : entry.getKey().getDerivedAggregationSelectItems()) {
+                for (AggregationSelectItem each : entry.getKey().getDerivedAggregationSelectItems()) {  // AVG 聚合列
                     values.add(getAggregationValue(each));
                 }
             }
@@ -123,7 +123,7 @@ public final class GroupByStreamResultSetMerger extends OrderByStreamResultSetMe
     
     private void setAggregationValueToCurrentRow(final Map<AggregationSelectItem, AggregationUnit> aggregationUnitMap) {
         for (Entry<AggregationSelectItem, AggregationUnit> entry : aggregationUnitMap.entrySet()) {
-            currentRow.set(entry.getKey().getIndex() - 1, entry.getValue().getResult());
+            currentRow.set(entry.getKey().getIndex() - 1, entry.getValue().getResult());  // 获取计算结果
         }
     }
     

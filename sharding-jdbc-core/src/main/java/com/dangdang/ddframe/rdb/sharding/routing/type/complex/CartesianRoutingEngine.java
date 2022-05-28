@@ -37,7 +37,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 /**
- * cartesian routing engine.
+ * cartesian routing engine. 笛卡尔积的库表路由引擎
  * 
  * @author zhangliang
  */
@@ -50,20 +50,20 @@ public final class CartesianRoutingEngine implements RoutingEngine {
     @Override
     public CartesianRoutingResult route() {
         CartesianRoutingResult result = new CartesianRoutingResult();
-        for (Entry<String, Set<String>> entry : getDataSourceLogicTablesMap().entrySet()) {
-            List<Set<String>> actualTableGroups = getActualTableGroups(entry.getKey(), entry.getValue());
-            List<Set<TableUnit>> tableUnitGroups = toTableUnitGroups(entry.getKey(), actualTableGroups);
+        for (Entry<String, Set<String>> entry : getDataSourceLogicTablesMap().entrySet()) {  // Entry<数据源（库）, Set<逻辑表>> entry
+            List<Set<String>> actualTableGroups = getActualTableGroups(entry.getKey(), entry.getValue());  // 获得当前数据源（库）的 路由表单元分组，List<Set<真实表>>
+            List<Set<TableUnit>> tableUnitGroups = toTableUnitGroups(entry.getKey(), actualTableGroups); // 笛卡尔积，并合并结果
             result.merge(entry.getKey(), getCartesianTableReferences(Sets.cartesianProduct(tableUnitGroups)));
         }
         log.trace("cartesian tables sharding result: {}", result);
         return result;
     }
-    
+    // 获得同库对应的逻辑表集合
     private Map<String, Set<String>> getDataSourceLogicTablesMap() {
         Collection<String> intersectionDataSources = getIntersectionDataSources();
         Map<String, Set<String>> result = new HashMap<>(routingResults.size());
-        for (RoutingResult each : routingResults) {
-            for (Entry<String, Set<String>> entry : each.getTableUnits().getDataSourceLogicTablesMap(intersectionDataSources).entrySet()) {
+        for (RoutingResult each : routingResults) { // 获得同库对应的逻辑表集合
+            for (Entry<String, Set<String>> entry : each.getTableUnits().getDataSourceLogicTablesMap(intersectionDataSources).entrySet()) {  // 过滤掉不在数据源（库）交集的逻辑表
                 if (result.containsKey(entry.getKey())) {
                     result.get(entry.getKey()).addAll(entry.getValue());
                 } else {
@@ -73,7 +73,7 @@ public final class CartesianRoutingEngine implements RoutingEngine {
         }
         return result;
     }
-    
+    // 获得所有路由结果里的数据源（库）交集
     private Collection<String> getIntersectionDataSources() {
         Collection<String> result = new HashSet<>();
         for (RoutingResult each : routingResults) {

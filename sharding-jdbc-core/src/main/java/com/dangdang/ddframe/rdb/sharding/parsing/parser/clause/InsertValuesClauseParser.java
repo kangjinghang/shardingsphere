@@ -41,7 +41,7 @@ public class InsertValuesClauseParser implements SQLClauseParser {
     }
     
     /**
-     * Parse insert values.
+     * Parse insert values. 解析值字段
      *
      * @param insertStatement insert statement
      */
@@ -61,31 +61,31 @@ public class InsertValuesClauseParser implements SQLClauseParser {
     protected Keyword[] getSynonymousKeywordsForValues() {
         return new Keyword[0];
     }
-    
+    // 解析值字段
     private void parseValues(final InsertStatement insertStatement) {
         lexerEngine.accept(Symbol.LEFT_PAREN);
-        List<SQLExpression> sqlExpressions = new LinkedList<>();
+        List<SQLExpression> sqlExpressions = new LinkedList<>();  // 解析表达式
         do {
             sqlExpressions.add(expressionClauseParser.parse(insertStatement));
         } while (lexerEngine.skipIfEqual(Symbol.COMMA));
         insertStatement.setValuesListLastPosition(lexerEngine.getCurrentToken().getEndPosition() - lexerEngine.getCurrentToken().getLiterals().length());
         int count = 0;
-        for (Column each : insertStatement.getColumns()) {
+        for (Column each : insertStatement.getColumns()) {  // 解析值字段
             SQLExpression sqlExpression = sqlExpressions.get(count);
             insertStatement.getConditions().add(new Condition(each, sqlExpression), shardingRule);
-            if (insertStatement.getGenerateKeyColumnIndex() == count) {
+            if (insertStatement.getGenerateKeyColumnIndex() == count) {  // 自动生成键
                 insertStatement.setGeneratedKey(createGeneratedKey(each, sqlExpression));
             }
             count++;
         }
-        lexerEngine.accept(Symbol.RIGHT_PAREN);
+        lexerEngine.accept(Symbol.RIGHT_PAREN); // 字段以 "," 分隔
     }
-    
+    // 创建 自动生成键
     private GeneratedKey createGeneratedKey(final Column column, final SQLExpression sqlExpression) {
         GeneratedKey result;
-        if (sqlExpression instanceof SQLPlaceholderExpression) {
+        if (sqlExpression instanceof SQLPlaceholderExpression) {  // 占位符
             result = new GeneratedKey(column.getName(), ((SQLPlaceholderExpression) sqlExpression).getIndex(), null);
-        } else if (sqlExpression instanceof SQLNumberExpression) {
+        } else if (sqlExpression instanceof SQLNumberExpression) { // 数字
             result = new GeneratedKey(column.getName(), -1, ((SQLNumberExpression) sqlExpression).getNumber());
         } else {
             throw new ShardingJdbcException("Generated key only support number.");

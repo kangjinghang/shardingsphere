@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.TreeSet;
 
 /**
- * Tables collection.
+ * Tables collection. 表集合对象。属于分片上下文信息
  * 
  * @author zhangliang
  */

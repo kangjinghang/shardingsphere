@@ -27,7 +27,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 
 /**
- * Adapter for {@code Statement}.
+ * Adapter for {@code Statement}. 静态语句对象适配类
  * 
  * @author zhangliang
  * @author gaohongtao
@@ -114,7 +114,7 @@ public abstract class AbstractStatementAdapter extends AbstractUnsupportedOperat
             each.cancel();
         }
     }
-    
+    // 调用持有的 Statement 计算更新数量
     @Override
     public final int getUpdateCount() throws SQLException {
         long result = 0;
@@ -198,6 +198,6 @@ public abstract class AbstractStatementAdapter extends AbstractUnsupportedOperat
             each.setQueryTimeout(seconds);
         }
     }
-    
+    // 获取路由的静态语句对象集合
     protected abstract Collection<? extends Statement> getRoutedStatements();
 }

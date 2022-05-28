@@ -26,7 +26,7 @@ import java.util.Collections;
 import java.util.TreeSet;
 
 /**
- * Sharding strategy.
+ * Sharding strategy. 分片策略。分片资源：在分库策略里指的是库，在分表策略里指的是表。
  * 
  * @author zhangliang
  */
@@ -48,11 +48,11 @@ public class ShardingStrategy {
     }
     
     /**
-     * Calculate static sharding info.
+     * Calculate static sharding info. 计算静态分片（常用）
      *
-     * @param availableTargetNames available data sources or tables's names
-     * @param shardingValues sharding values
-     * @return sharding results for data sources or tables's names
+     * @param availableTargetNames available data sources or tables's names 所有的可用分片资源集合
+     * @param shardingValues sharding values 分片值集合
+     * @return sharding results for data sources or tables's names 分库后指向的数据源名称集合
      */
     public Collection<String> doStaticSharding(final Collection<String> availableTargetNames, final Collection<ShardingValue<?>> shardingValues) {
         Collection<String> result = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
@@ -65,10 +65,10 @@ public class ShardingStrategy {
     }
     
     /**
-     * Calculate dynamic sharding info.
+     * Calculate dynamic sharding info. 计算动态分片，动态分片对应 TableRule.dynamic=true，动态分片必须有分片值
      *
-     * @param shardingValues sharding values
-     * @return sharding results for data sources or tables's names
+     * @param shardingValues sharding values 分片值集合
+     * @return sharding results for data sources or tables's names 分库后指向的分片资源集合
      */
     public Collection<String> doDynamicSharding(final Collection<ShardingValue<?>> shardingValues) {
         Preconditions.checkState(!shardingValues.isEmpty(), "Dynamic table should contain sharding value.");
@@ -80,10 +80,10 @@ public class ShardingStrategy {
     
     @SuppressWarnings({ "unchecked", "rawtypes" })
     private Collection<String> doSharding(final Collection<ShardingValue<?>> shardingValues, final Collection<String> availableTargetNames) {
-        if (shardingAlgorithm instanceof NoneKeyShardingAlgorithm) {
+        if (shardingAlgorithm instanceof NoneKeyShardingAlgorithm) { // 无片键，对应 NoneKeyShardingAlgorithm 分片算法接口
             return Collections.singletonList(((NoneKeyShardingAlgorithm) shardingAlgorithm).doSharding(availableTargetNames, shardingValues.iterator().next()));
         }
-        if (shardingAlgorithm instanceof SingleKeyShardingAlgorithm) {
+        if (shardingAlgorithm instanceof SingleKeyShardingAlgorithm) { // 单片键，对应 SingleKeyShardingAlgorithm 分片算法接口
             SingleKeyShardingAlgorithm<?> singleKeyShardingAlgorithm = (SingleKeyShardingAlgorithm<?>) shardingAlgorithm;
             ShardingValue shardingValue = shardingValues.iterator().next();
             switch (shardingValue.getType()) {
@@ -97,7 +97,7 @@ public class ShardingStrategy {
                     throw new UnsupportedOperationException(shardingValue.getType().getClass().getName());
             }
         }
-        if (shardingAlgorithm instanceof MultipleKeysShardingAlgorithm) {
+        if (shardingAlgorithm instanceof MultipleKeysShardingAlgorithm) { // 多片键，对应 MultipleKeysShardingAlgorithm 分片算法接口
             return ((MultipleKeysShardingAlgorithm) shardingAlgorithm).doSharding(availableTargetNames, shardingValues);
         }
         throw new UnsupportedOperationException(shardingAlgorithm.getClass().getName());

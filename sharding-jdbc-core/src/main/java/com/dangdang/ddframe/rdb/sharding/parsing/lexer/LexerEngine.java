@@ -65,7 +65,7 @@ public final class LexerEngine {
     }
     
     /**
-     * skip all tokens that inside parentheses.
+     * skip all tokens that inside parentheses. 跳过小括号内所有的词法标记
      *
      * @param sqlStatement SQL statement
      * @return skipped string
@@ -81,18 +81,18 @@ public final class LexerEngine {
                 if (equalAny(Symbol.QUESTION)) {
                     sqlStatement.increaseParametersIndex();
                 }
-                if (Assist.END == lexer.getCurrentToken().getType() || (Symbol.RIGHT_PAREN == lexer.getCurrentToken().getType() && 0 == count)) {
+                if (Assist.END == lexer.getCurrentToken().getType() || (Symbol.RIGHT_PAREN == lexer.getCurrentToken().getType() && 0 == count)) { // 到达结尾 或者 匹配合适数的)右括号
                     break;
                 }
-                if (Symbol.LEFT_PAREN == lexer.getCurrentToken().getType()) {
+                if (Symbol.LEFT_PAREN == lexer.getCurrentToken().getType()) { // 处理里面有多个括号的情况，例如：SELECT COUNT(DISTINCT(order_id)) FROM t_order
                     count++;
                 } else if (Symbol.RIGHT_PAREN == lexer.getCurrentToken().getType()) {
                     count--;
                 }
-                lexer.nextToken();
+                lexer.nextToken();  // 下一个词法
             }
-            result.append(lexer.getInput().substring(beginPosition, lexer.getCurrentToken().getEndPosition()));
-            lexer.nextToken();
+            result.append(lexer.getInput().substring(beginPosition, lexer.getCurrentToken().getEndPosition())); // 获得括号内的内容
+            lexer.nextToken(); // 下一个词法
         }
         return result.toString();
     }

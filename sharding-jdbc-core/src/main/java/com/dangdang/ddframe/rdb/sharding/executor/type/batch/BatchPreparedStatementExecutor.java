@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * PreparedStatement Executor for  multiple threads to process add batch.
+ * PreparedStatement Executor for  multiple threads to process add batch. 批量预编译语句对象请求的执行器
  * 
  * @author zhangliang
  */
@@ -47,9 +47,9 @@ public final class BatchPreparedStatementExecutor {
     private final List<List<Object>> parameterSets;
     
     /**
-     * Execute batch.
+     * Execute batch. 执行批量SQL
      * 
-     * @return execute results
+     * @return execute results 执行结果
      */
     public int[] executeBatch() {
         return accumulate(executorEngine.executeBatch(sqlType, batchPreparedStatementUnits, parameterSets, new ExecuteCallback<int[]>() {
@@ -60,11 +60,11 @@ public final class BatchPreparedStatementExecutor {
             }
         }));
     }
-    
+    // 计算每个语句的更新数量
     private int[] accumulate(final List<int[]> results) {
         int[] result = new int[parameterSets.size()];
         int count = 0;
-        for (BatchPreparedStatementUnit each : batchPreparedStatementUnits) {
+        for (BatchPreparedStatementUnit each : batchPreparedStatementUnits) {  // 每个语句按照顺序，读取到其对应的每个分片SQL影响的行数进行累加
             for (Map.Entry<Integer, Integer> entry : each.getJdbcAndActualAddBatchCallTimesMap().entrySet()) {
                 int value = null == results.get(count) ? 0 : results.get(count)[entry.getValue()];
                 if (DatabaseType.Oracle == dbType) {

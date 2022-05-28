@@ -25,7 +25,7 @@ import com.dangdang.ddframe.rdb.sharding.parsing.parser.token.SQLToken;
 import java.util.List;
 
 /**
- * SQL statement.
+ * SQL statement. Statement 包含两部分信息：分片上下文：用于 SQL 路由。SQL 标记对象：用于 SQL 改写。
  *
  * @author zhangliang
  */
@@ -39,21 +39,21 @@ public interface SQLStatement {
     SQLType getType();
     
     /**
-     * Get tables.
+     * Get tables. 分片上下文：用于 SQL 路由
      * 
      * @return tables
      */
     Tables getTables();
     
     /**
-     * Get conditions.
+     * Get conditions. 分片上下文：用于 SQL 路由
      *
      * @return conditions
      */
     Conditions getConditions();
     
     /**
-     * Get SQL Tokens.
+     * Get SQL Tokens. SQL 标记对象：用于 SQL 改写
      * 
      * @return SQL Tokens
      */

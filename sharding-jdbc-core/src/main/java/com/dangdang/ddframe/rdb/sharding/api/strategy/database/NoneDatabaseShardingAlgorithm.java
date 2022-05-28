@@ -22,7 +22,7 @@ import com.dangdang.ddframe.rdb.sharding.api.ShardingValue;
 import java.util.Collection;
 
 /**
- * Database sharding algorithm for none sharding interface.
+ * Database sharding algorithm for none sharding interface. NoneXXXXShardingAlgorithm 只适用于无分库/表的需求，否则会是错误的路由结果。例如，#doEqualSharding() 返回的是第一个分片资源。
  * 
  * @author zhangliang
  */

@@ -22,7 +22,7 @@ import java.sql.SQLException;
 import java.util.Calendar;
 
 /**
- * ResultSet merger interface.
+ * ResultSet merger interface. 归并结果集接口
  *
  * @author zhangliang
  */

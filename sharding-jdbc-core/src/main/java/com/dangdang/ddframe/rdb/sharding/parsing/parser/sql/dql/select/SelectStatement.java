@@ -40,7 +40,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Select statement.
+ * Select statement. 查询语句解析结果对象
  *
  * @author zhangliang
  */
@@ -48,19 +48,19 @@ import java.util.Set;
 @Setter
 @ToString(callSuper = true)
 public final class SelectStatement extends DQLStatement {
-    
+    // 是否查询所有字段，即 SELECT *
     private boolean containStar;
-    
+    // 最后一个查询项下一个 Token 的开始位置
     private int selectListLastPosition;
-    
+    // 最后一个分组项下一个 Token 的开始位置
     private int groupByLastPosition;
-    
+    // 查询项
     private final Set<SelectItem> items = new HashSet<>();
-    
+    // 分组项
     private final List<OrderItem> groupByItems = new LinkedList<>();
-    
+    // 排序项
     private final List<OrderItem> orderByItems = new LinkedList<>();
-    
+    // 分页
     private Limit limit;
     
     @Getter(AccessLevel.NONE)
@@ -68,7 +68,7 @@ public final class SelectStatement extends DQLStatement {
     private SelectStatement subQueryStatement;
     
     /**
-     * Get alias.
+     * Get alias. 字段在查询项里的别名
      * 
      * @param name name or alias
      * @return alias
@@ -118,16 +118,16 @@ public final class SelectStatement extends DQLStatement {
     }
     
     /**
-     * Set index for select items.
+     * Set index for select items. 为选择项设置索引
      * 
-     * @param columnLabelIndexMap map for column label and index
+     * @param columnLabelIndexMap map for column label and index 列标签索引字典
      */
     public void setIndexForItems(final Map<String, Integer> columnLabelIndexMap) {
         setIndexForAggregationItem(columnLabelIndexMap);
-        setIndexForOrderItem(columnLabelIndexMap, orderByItems);
+        setIndexForOrderItem(columnLabelIndexMap, orderByItems); // 处理 ORDER BY / GROUP BY 列不在查询列 推导出的查询列的位置
         setIndexForOrderItem(columnLabelIndexMap, groupByItems);
     }
-    
+    // 处理 AVG聚合计算列 推导出其对应的 SUM/COUNT 聚合计算列的位置
     private void setIndexForAggregationItem(final Map<String, Integer> columnLabelIndexMap) {
         for (AggregationSelectItem each : getAggregationSelectItems()) {
             Preconditions.checkState(columnLabelIndexMap.containsKey(each.getColumnLabel()), String.format("Can't find index: %s, please add alias for aggregate selections", each));
@@ -138,7 +138,7 @@ public final class SelectStatement extends DQLStatement {
             }
         }
     }
-    
+    // 处理 ORDER BY / GROUP BY 列不在查询列 推导出的查询列的位置
     private void setIndexForOrderItem(final Map<String, Integer> columnLabelIndexMap, final List<OrderItem> orderItems) {
         for (OrderItem each : orderItems) {
             if (-1 != each.getIndex()) {

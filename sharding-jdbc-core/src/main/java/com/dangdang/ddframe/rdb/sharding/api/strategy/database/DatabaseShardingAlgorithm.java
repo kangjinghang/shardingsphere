@@ -20,7 +20,7 @@ package com.dangdang.ddframe.rdb.sharding.api.strategy.database;
 import com.dangdang.ddframe.rdb.sharding.routing.strategy.ShardingAlgorithm;
 
 /**
- * Database sharding algorithm interface.
+ * Database sharding algorithm interface. 分库分片算法
  * 
  * @author zhangliang
  */

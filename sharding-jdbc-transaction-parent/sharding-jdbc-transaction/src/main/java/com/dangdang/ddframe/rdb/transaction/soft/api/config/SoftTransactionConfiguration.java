@@ -36,7 +36,7 @@ import java.sql.SQLException;
 import static com.dangdang.ddframe.rdb.transaction.soft.constants.TransactionLogDataSourceType.RDB;
 
 /**
- * B.A.S.E transaction configuration.
+ * B.A.S.E transaction configuration. 柔性事务配置对象
  * 
  * @author zhangliang
  */
@@ -46,28 +46,28 @@ import static com.dangdang.ddframe.rdb.transaction.soft.constants.TransactionLog
 public class SoftTransactionConfiguration {
     
     /**
-     * Data source for transaction manager.
+     * Data source for transaction manager. 事务管理器管理的数据源
      */
     @Getter(AccessLevel.NONE)
     private final DataSource targetDataSource;
     
     /**
-     * Max synchronized delivery try times.
+     * Max synchronized delivery try times. 同步的事务送达的最大尝试次数
      */
     private int syncMaxDeliveryTryTimes = 3;
     
     /**
-     * Transaction log storage type.
+     * Transaction log storage type. 事务日志存储类型
      */
     private TransactionLogDataSourceType storageType = RDB;
     
     /**
-     * Transaction log data source.
+     * Transaction log data source. 存储事务日志的数据源
      */
     private DataSource transactionLogDataSource;
     
     /**
-     * Embed best efforts delivery B.A.S.E transaction asynchronized job configuration.
+     * Embed best efforts delivery B.A.S.E transaction asynchronized job configuration.  内嵌的最大努力送达型异步作业配置对象
      */
     private Optional<NestedBestEffortsDeliveryJobConfiguration> bestEffortsDeliveryJobConfiguration = Optional.absent();
     

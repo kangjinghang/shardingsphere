@@ -39,13 +39,13 @@ import java.util.List;
 @Setter
 @ToString
 public abstract class AbstractSQLStatement implements SQLStatement {
-    
+    // SQL 类型
     private final SQLType type;
-    
+    // 表
     private final Tables tables = new Tables();
-    
+    // 过滤条件。只有对路由结果有影响的条件，才添加进数组
     private final Conditions conditions = new Conditions();
-    
+    // SQL标记对象
     private final List<SQLToken> sqlTokens = new LinkedList<>();
     
     private int parametersIndex;

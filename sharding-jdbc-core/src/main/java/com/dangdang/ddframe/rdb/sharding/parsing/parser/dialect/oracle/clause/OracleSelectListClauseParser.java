@@ -16,7 +16,7 @@ public final class OracleSelectListClauseParser extends SelectListClauseParser {
     public OracleSelectListClauseParser(final ShardingRule shardingRule, final LexerEngine lexerEngine) {
         super(shardingRule, lexerEngine);
     }
-    
+    // Oracle 独有：https://docs.oracle.com/cd/B19306_01/server.102/b14200/operators004.htm
     @Override
     protected Keyword[] getSkippedKeywordsBeforeSelectItem() {
         return new Keyword[] {OracleKeyword.CONNECT_BY_ROOT};

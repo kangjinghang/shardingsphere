@@ -30,26 +30,26 @@ import java.sql.SQLException;
 import java.util.List;
 
 /**
- * Best efforts delivery job.
- * 
+ * Best efforts delivery job. 最大努力送达型异步作业
+ * 当最大努力送达型事务监听器( BestEffortsDeliveryListener )多次同步重试失败后，交给最大努力送达型异步作业进行多次异步重试，并且多次执行有固定间隔。
  * @author zhangliang
  * @author caohao
  */
 @Slf4j
 public class BestEffortsDeliveryJob extends AbstractIndividualThroughputDataFlowElasticJob<TransactionLog> {
-    
+    // 最大努力送达型异步作业配置对象
     @Setter
     private BestEffortsDeliveryConfiguration bedConfig;
-    
+    // 事务日志存储器对象
     @Setter
     private TransactionLogStorage transactionLogStorage;
-    
+    // 获取需要处理的事务日志 (TransactionLog)，内部调用了 TransactionLogStorage#findEligibleTransactionLogs() 方法
     @Override
     public List<TransactionLog> fetchData(final JobExecutionMultipleShardingContext context) {
         return transactionLogStorage.findEligibleTransactionLogs(context.getFetchDataCount(), 
             bedConfig.getJobConfig().getMaxDeliveryTryTimes(), bedConfig.getJobConfig().getMaxDeliveryTryDelayMillis());
     }
-    
+    // 处理事务日志，重试执行失败的 SQL，内部调用了 TransactionLogStorage#processData()
     @Override
     public boolean processData(final JobExecutionMultipleShardingContext context, final TransactionLog data) {
         try (

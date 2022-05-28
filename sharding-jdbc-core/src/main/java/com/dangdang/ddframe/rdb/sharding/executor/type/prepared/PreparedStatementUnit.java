@@ -32,8 +32,8 @@ import java.sql.PreparedStatement;
 @RequiredArgsConstructor
 @Getter
 public final class PreparedStatementUnit implements BaseStatementUnit {
-    
+    // SQL 执行单元
     private final SQLExecutionUnit sqlExecutionUnit;
-    
+    // 预编译语句对象
     private final PreparedStatement statement;
 }

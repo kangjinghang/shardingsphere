@@ -21,7 +21,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
- * Placeholder expression.
+ * Placeholder expression. 占位符表达式。对应Token：Symbol.QUESTION
  *
  * @author zhangliang
  */

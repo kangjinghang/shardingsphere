@@ -42,7 +42,7 @@ import java.util.List;
  * @author zhangliang
  */
 public final class ShardingResultSet extends AbstractResultSetAdapter {
-    
+    // 归并结果集
     private final ResultSetMerger mergeResultSet;
     
     public ShardingResultSet(final List<ResultSet> resultSets, final ResultSetMerger mergeResultSet) {

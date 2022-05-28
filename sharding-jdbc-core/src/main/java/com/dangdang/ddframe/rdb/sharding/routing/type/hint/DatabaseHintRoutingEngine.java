@@ -34,7 +34,7 @@ import java.util.Collection;
 import java.util.Collections;
 
 /**
- * Database hint only routing engine.
+ * Database hint only routing engine. 基于数据库提示的路由引擎
  * 
  * @author gaohongtao
  * @author zhangliang
@@ -49,13 +49,13 @@ public final class DatabaseHintRoutingEngine implements RoutingEngine {
     
     @Override
     public RoutingResult route() {
-        Optional<ShardingValue<?>> shardingValue = HintManagerHolder.getDatabaseShardingValue(new ShardingKey(HintManagerHolder.DB_TABLE_NAME, HintManagerHolder.DB_COLUMN_NAME));
+        Optional<ShardingValue<?>> shardingValue = HintManagerHolder.getDatabaseShardingValue(new ShardingKey(HintManagerHolder.DB_TABLE_NAME, HintManagerHolder.DB_COLUMN_NAME)); // 从 Hint 获得 分片键值
         Preconditions.checkState(shardingValue.isPresent());
         log.debug("Before database sharding only db:{} sharding values: {}", dataSourceRule.getDataSourceNames(), shardingValue.get());
-        Collection<String> routingDataSources = databaseShardingStrategy.doStaticSharding(dataSourceRule.getDataSourceNames(), Collections.<ShardingValue<?>>singleton(shardingValue.get()));
+        Collection<String> routingDataSources = databaseShardingStrategy.doStaticSharding(dataSourceRule.getDataSourceNames(), Collections.<ShardingValue<?>>singleton(shardingValue.get())); // 路由。表分片规则使用的是 ShardingRule 里的。因为没 SQL 解析
         Preconditions.checkState(!routingDataSources.isEmpty(), "no database route info");
         log.debug("After database sharding only result: {}", routingDataSources);
-        RoutingResult result = new RoutingResult();
+        RoutingResult result = new RoutingResult(); // 路由结果
         for (String each : routingDataSources) {
             result.getTableUnits().getTableUnits().add(new TableUnit(each, "", ""));
         }

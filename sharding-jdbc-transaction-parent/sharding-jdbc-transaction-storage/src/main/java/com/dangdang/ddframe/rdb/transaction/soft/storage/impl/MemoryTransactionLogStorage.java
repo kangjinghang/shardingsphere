@@ -29,7 +29,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Transaction log memory storage.
+ * Transaction log memory storage. 基于内存的事务日志存储器。主要用于开发测试，生产环境下不要使用。
  * 
  * @author zhangliang
  */

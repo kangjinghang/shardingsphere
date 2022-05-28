@@ -35,7 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Transaction relationship database log storage.
+ * Transaction relationship database log storage. 基于数据库的事务日志存储器
  *
  * @author zhangliang
  */
@@ -43,7 +43,7 @@ import java.util.List;
 public final class RdbTransactionLogStorage implements TransactionLogStorage {
     
     private final DataSource dataSource;
-    
+    // 如果插入事务日志失败，SQL 会继续执行，如果此时 SQL 执行失败，则该 SQL 会不见了。建议：#add() 和下文的 #remove() 异常时，都打印下异常日志都文件系统
     @Override
     public void add(final TransactionLog transactionLog) {
         String sql = "INSERT INTO `transaction_log` (`id`, `transaction_type`, `data_source`, `sql`, `parameters`, `creation_time`) VALUES (?, ?, ?, ?, ?, ?);";
@@ -116,7 +116,7 @@ public final class RdbTransactionLogStorage implements TransactionLogStorage {
     
     @Override
     public boolean processData(final Connection connection, final TransactionLog transactionLog, final int maxDeliveryTryTimes) {
-        try (
+        try ( // 重试执行失败 SQL
             Connection conn = connection;
             PreparedStatement preparedStatement = conn.prepareStatement(transactionLog.getSql())) {
             for (int parameterIndex = 0; parameterIndex < transactionLog.getParameters().size(); parameterIndex++) {
@@ -124,10 +124,10 @@ public final class RdbTransactionLogStorage implements TransactionLogStorage {
             }
             preparedStatement.executeUpdate();
         } catch (final SQLException ex) {
-            increaseAsyncDeliveryTryTimes(transactionLog.getId());
+            increaseAsyncDeliveryTryTimes(transactionLog.getId());  // 重试失败，更新事务日志，增加已异步重试次数
             throw new TransactionCompensationException(ex);
         }
-        remove(transactionLog.getId());
+        remove(transactionLog.getId());  // 移除重试执行成功 SQL 对应的事务日志
         return true;
     }
 }

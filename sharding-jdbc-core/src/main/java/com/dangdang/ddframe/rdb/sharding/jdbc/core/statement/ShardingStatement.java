@@ -218,10 +218,10 @@ public class ShardingStatement extends AbstractStatementAdapter {
     @Override
     public ResultSet getGeneratedKeys() throws SQLException {
         Optional<GeneratedKey> generatedKey = getGeneratedKey();
-        if (returnGeneratedKeys && generatedKey.isPresent()) {
+        if (returnGeneratedKeys && generatedKey.isPresent()) { // 分布式主键
             return new GeneratedKeysResultSet(routeResult.getGeneratedKeys().iterator(), generatedKey.get().getColumn(), this);
         }
-        if (1 == getRoutedStatements().size()) {
+        if (1 == getRoutedStatements().size()) { // 数据库自增
             return getRoutedStatements().iterator().next().getGeneratedKeys();
         }
         return new GeneratedKeysResultSet();

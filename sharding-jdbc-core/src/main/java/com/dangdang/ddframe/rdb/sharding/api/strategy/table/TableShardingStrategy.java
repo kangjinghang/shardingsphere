@@ -22,7 +22,7 @@ import com.dangdang.ddframe.rdb.sharding.routing.strategy.ShardingStrategy;
 import java.util.Collection;
 
 /**
- * Table sharding strategy.
+ * Table sharding strategy. 使用分表算法进行分片
  * 
  * @author zhangliang
  */

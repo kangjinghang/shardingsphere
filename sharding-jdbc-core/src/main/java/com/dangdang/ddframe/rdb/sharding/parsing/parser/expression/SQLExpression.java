@@ -18,7 +18,7 @@
 package com.dangdang.ddframe.rdb.sharding.parsing.parser.expression;
 
 /**
- * SQL expression interface.
+ * SQL expression interface. SQL表达式接口
  * 
  * @author zhangliang 
  */

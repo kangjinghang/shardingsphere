@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Aggregation select item.
+ * Aggregation select item. 聚合选择项
  *
  * @author zhangliang
  */

@@ -25,16 +25,16 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * SQL builder.
+ * SQL builder. SQL构建器
  * 
  * @author gaohongtao
  * @author zhangliang
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class SQLBuilder {
-    
+    // 段集合
     private final List<Object> segments;
-    
+    // 当前段
     private StringBuilder currentSegment;
     
     /**
@@ -47,30 +47,30 @@ public final class SQLBuilder {
     }
     
     /**
-     * Append literals.
+     * Append literals. 追加字面量
      *
-     * @param literals literals for SQL
+     * @param literals literals for SQL 字面量
      */
     public void appendLiterals(final String literals) {
         currentSegment.append(literals);
     }
     
     /**
-     * Append table token.
+     * Append table token. 追加表占位符
      *
-     * @param tableName table name
+     * @param tableName table name 表名称
      */
     public void appendTable(final String tableName) {
-        segments.add(new TableToken(tableName));
-        currentSegment = new StringBuilder();
+        segments.add(new TableToken(tableName)); // 添加 TableToken
+        currentSegment = new StringBuilder(); // 新建当前段
         segments.add(currentSegment);
     }
     
     /**
-     * Convert to SQL string.
+     * Convert to SQL string. 生成SQL语句
      *
-     * @param tableTokens table tokens
-     * @return SQL string
+     * @param tableTokens table tokens  占位符集合（逻辑表与真实表映射）
+     * @return SQL string SQL语句
      */
     public String toSQL(final Map<String, String> tableTokens) {
         StringBuilder result = new StringBuilder();
@@ -86,7 +86,7 @@ public final class SQLBuilder {
     
     @RequiredArgsConstructor
     private class TableToken {
-        
+        // 表名
         private final String tableName;
         
         @Override
