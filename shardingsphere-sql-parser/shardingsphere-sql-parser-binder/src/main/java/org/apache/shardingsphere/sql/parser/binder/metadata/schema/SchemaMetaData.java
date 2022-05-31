@@ -28,10 +28,10 @@ import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Schema meta data.
+ * Schema meta data. Schema 元数据
  */
 public final class SchemaMetaData {
-    
+    // 表元数据
     private final Map<String, TableMetaData> tables;
     
     public SchemaMetaData(final Map<String, TableMetaData> tables) {

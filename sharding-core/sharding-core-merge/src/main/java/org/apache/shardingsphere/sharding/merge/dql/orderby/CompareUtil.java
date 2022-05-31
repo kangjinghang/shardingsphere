@@ -28,7 +28,7 @@ import org.apache.shardingsphere.sql.parser.sql.constant.OrderDirection;
 public final class CompareUtil {
     
     /**
-     * Compare two object with order type.
+     * Compare two object with order type. 根据排序方向进行返回比较结果，当降序时直接返回值得比较结果，如果是升序则对值比较结果取反
      *
      * @param thisValue this value
      * @param otherValue other value
@@ -51,7 +51,7 @@ public final class CompareUtil {
         if (!caseSensitive && thisValue instanceof String && otherValue instanceof String) {
             return compareToCaseInsensitiveString((String) thisValue, (String) otherValue, orderDirection);
         }
-        return OrderDirection.ASC == orderDirection ? thisValue.compareTo(otherValue) : -thisValue.compareTo(otherValue);
+        return OrderDirection.ASC == orderDirection ? thisValue.compareTo(otherValue) : -thisValue.compareTo(otherValue); // 当升序时，将比较结果值取反
     }
     
     private static int compareToCaseInsensitiveString(final String thisValue, final String otherValue, final OrderDirection orderDirection) {

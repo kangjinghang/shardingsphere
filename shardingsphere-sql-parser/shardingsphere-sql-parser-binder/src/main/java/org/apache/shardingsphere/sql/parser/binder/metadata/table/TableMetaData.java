@@ -32,15 +32,15 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Table meta data.
+ * Table meta data. 表元数据
  */
 @Getter
 @EqualsAndHashCode
 @ToString
 public final class TableMetaData {
-    
+    // 列元数据
     private final Map<String, ColumnMetaData> columns;
-    
+    // 索引元数据
     private final Map<String, IndexMetaData> indexes;
     
     @Getter(AccessLevel.NONE)

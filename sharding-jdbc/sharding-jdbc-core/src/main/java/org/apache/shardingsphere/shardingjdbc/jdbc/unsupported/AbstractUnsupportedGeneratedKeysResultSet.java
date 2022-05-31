@@ -32,7 +32,7 @@ import java.sql.Timestamp;
 import java.util.Calendar;
 
 /**
- * Unsupported {@code ResultSet} methods for generated keys.
+ * Unsupported {@code ResultSet} methods for generated keys. 定义了GeneratedKeys不支持方法（Statement中getGeneratedKeys()返回值）
  */
 public abstract class AbstractUnsupportedGeneratedKeysResultSet extends AbstractUnsupportedOperationResultSet {
     

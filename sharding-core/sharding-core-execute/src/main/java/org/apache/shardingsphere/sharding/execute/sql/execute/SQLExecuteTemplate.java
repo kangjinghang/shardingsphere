@@ -29,7 +29,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * SQL execute template.
+ * SQL execute template. 执行引擎的关键类
  */
 @RequiredArgsConstructor
 public final class SQLExecuteTemplate {
@@ -64,7 +64,7 @@ public final class SQLExecuteTemplate {
     @SuppressWarnings("unchecked")
     public <T> List<T> execute(final Collection<InputGroup<? extends StatementExecuteUnit>> inputGroups,
                                final SQLExecuteCallback<T> firstCallback, final SQLExecuteCallback<T> callback) throws SQLException {
-        try {
+        try { // 真正调用的是 executorEngine.execute 方法
             return executorEngine.execute((Collection) inputGroups, firstCallback, callback, serial);
         } catch (final SQLException ex) {
             ExecutorExceptionHandler.handleException(ex);

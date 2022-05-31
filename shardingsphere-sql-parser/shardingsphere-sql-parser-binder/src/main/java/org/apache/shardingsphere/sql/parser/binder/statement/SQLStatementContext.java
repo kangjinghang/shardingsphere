@@ -21,7 +21,7 @@ import org.apache.shardingsphere.sql.parser.binder.segment.table.TablesContext;
 import org.apache.shardingsphere.sql.parser.sql.statement.SQLStatement;
 
 /**
- * SQL statement context.
+ * SQL statement context. 相当于 SQLStatement 的二次处理类，它也是后续路由、改写等环节间传递的上下文对象，每种 Context 往往对应一个 ContextEngine
  * 
  * @param <T> type of SQL statement
  */

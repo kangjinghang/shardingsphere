@@ -23,7 +23,7 @@ import org.apache.shardingsphere.sql.parser.binder.metadata.schema.SchemaMetaDat
 import org.apache.shardingsphere.underlying.common.metadata.datasource.DataSourceMetas;
 
 /**
- * ShardingSphere meta data.
+ * ShardingSphere meta data. 定义了关于数据库、表、索引的元数据
  */
 @RequiredArgsConstructor
 @Getter

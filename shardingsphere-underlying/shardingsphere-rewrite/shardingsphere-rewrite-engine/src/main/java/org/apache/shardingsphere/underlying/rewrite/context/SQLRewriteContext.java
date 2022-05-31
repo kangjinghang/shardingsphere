@@ -60,13 +60,13 @@ public final class SQLRewriteContext {
         this.sqlStatementContext = sqlStatementContext;
         this.sql = sql;
         this.parameters = parameters;
-        addSQLTokenGenerators(new DefaultTokenGeneratorBuilder().getSQLTokenGenerators());
+        addSQLTokenGenerators(new DefaultTokenGeneratorBuilder().getSQLTokenGenerators()); // 添加Token生成器
         parameterBuilder = sqlStatementContext instanceof InsertStatementContext
                 ? new GroupedParameterBuilder(((InsertStatementContext) sqlStatementContext).getGroupedParameters()) : new StandardParameterBuilder(parameters);
     }
     
     /**
-     * Add SQL token generators.
+     * Add SQL token generators. 添加Token生成器
      * 
      * @param sqlTokenGenerators SQL token generators
      */
@@ -75,7 +75,7 @@ public final class SQLRewriteContext {
     }
     
     /**
-     * Generate SQL tokens.
+     * Generate SQL tokens. 根据添加的Token生成器生成Token
      */
     public void generateSQLTokens() {
         sqlTokens.addAll(sqlTokenGenerators.generateSQLTokens(sqlStatementContext, parameters, schemaMetaData));

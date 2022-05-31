@@ -26,12 +26,12 @@ import org.apache.shardingsphere.underlying.rewrite.sql.impl.DefaultSQLBuilder;
 public final class SQLRewriteEngine {
     
     /**
-     * Rewrite SQL and parameters.
+     * Rewrite SQL and parameters. 通过 DefaultSQLBuilder 类对象的 toSQL() 生成了改写后 SQL，然后创建了 SQLRewriteResult 实例
      *
      * @param sqlRewriteContext SQL rewrite context
      * @return SQL rewrite result
      */
-    public SQLRewriteResult rewrite(final SQLRewriteContext sqlRewriteContext) {
+    public SQLRewriteResult rewrite(final SQLRewriteContext sqlRewriteContext) { // 将 SQL 改写上下文中 Token 转化成 SQL， 获取改写后参数，然后构造成 SQL 改写结果返回
         return new SQLRewriteResult(new DefaultSQLBuilder(sqlRewriteContext).toSQL(), sqlRewriteContext.getParameterBuilder().getParameters());
     }
 }

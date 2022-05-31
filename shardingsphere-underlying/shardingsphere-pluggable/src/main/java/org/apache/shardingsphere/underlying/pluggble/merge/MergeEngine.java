@@ -35,17 +35,17 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Merge engine.
+ * Merge engine. 合并引擎
  */
 public final class MergeEngine {
     
     private final Collection<BaseRule> rules;
-    
+    // 内部真正进行处理类
     private final MergeEntry merger;
     
     public MergeEngine(final Collection<BaseRule> rules, final ConfigurationProperties properties, final DatabaseType databaseType, final SchemaMetaData metaData) {
         this.rules = rules;
-        merger = new MergeEntry(databaseType, metaData, properties);
+        merger = new MergeEntry(databaseType, metaData, properties); // 构造真正的处理类 MergeEntry 实例
     }
     
     /**
@@ -57,17 +57,17 @@ public final class MergeEngine {
      * @throws SQLException SQL exception
      */
     public MergedResult merge(final List<QueryResult> queryResults, final SQLStatementContext sqlStatementContext) throws SQLException {
-        registerMergeDecorator();
-        return merger.process(queryResults, sqlStatementContext);
+        registerMergeDecorator(); // 注册归并装饰器
+        return merger.process(queryResults, sqlStatementContext); // 直接调用merger#process方法
     }
     
     private void registerMergeDecorator() {
         for (Class<? extends ResultProcessEngine> each : OrderedRegistry.getRegisteredClasses(ResultProcessEngine.class)) {
-            ResultProcessEngine processEngine = createProcessEngine(each);
+            ResultProcessEngine processEngine = createProcessEngine(each); // 实例化
             Class<?> ruleClass = (Class<?>) processEngine.getType();
             // FIXME rule.getClass().getSuperclass() == ruleClass for orchestration, should decouple extend between orchestration rule and sharding rule
             rules.stream().filter(rule -> rule.getClass() == ruleClass || rule.getClass().getSuperclass() == ruleClass).collect(Collectors.toList())
-                    .forEach(rule -> merger.registerProcessEngine(rule, processEngine));
+                    .forEach(rule -> merger.registerProcessEngine(rule, processEngine)); // 添加到 MergeEntry 实例的 engines 属性中
         }
     }
     

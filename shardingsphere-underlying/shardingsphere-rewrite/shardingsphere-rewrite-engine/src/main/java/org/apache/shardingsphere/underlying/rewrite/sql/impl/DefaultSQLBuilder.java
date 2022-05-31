@@ -21,7 +21,7 @@ import org.apache.shardingsphere.underlying.rewrite.context.SQLRewriteContext;
 import org.apache.shardingsphere.underlying.rewrite.sql.token.pojo.SQLToken;
 
 /**
- * Default SQL builder.
+ * Default SQL builder. 默认SQL构建器类，负责进行 SQL 的改写 SQL 的生成
  */
 public final class DefaultSQLBuilder extends AbstractSQLBuilder {
     
@@ -31,6 +31,6 @@ public final class DefaultSQLBuilder extends AbstractSQLBuilder {
     
     @Override
     protected String getSQLTokenText(final SQLToken sqlToken) {
-        return sqlToken.toString();
+        return sqlToken.toString(); // 返回 Token 对应的文本字符
     }
 }

@@ -41,13 +41,13 @@ public final class EncryptResultDecoratorEngine implements ResultDecoratorEngine
     public ResultDecorator newInstance(final DatabaseType databaseType, final SchemaMetaData schemaMetaData, 
                                        final EncryptRule encryptRule, final ConfigurationProperties properties, final SQLStatementContext sqlStatementContext) {
         if (sqlStatementContext instanceof SelectStatementContext) {
-            return new EncryptDQLResultDecorator(
+            return new EncryptDQLResultDecorator( // 创建 EncryptDQLResultDecorator 实例
                     new EncryptorMetaData(schemaMetaData, encryptRule, (SelectStatementContext) sqlStatementContext), properties.<Boolean>getValue(ConfigurationPropertyKey.QUERY_WITH_CIPHER_COLUMN));
         } 
         if (sqlStatementContext.getSqlStatement() instanceof DALStatement) {
-            return new EncryptDALResultDecorator();
+            return new EncryptDALResultDecorator(); // 创建 EncryptDALResultDecorator 实例
         }
-        return new TransparentResultDecorator();
+        return new TransparentResultDecorator(); // 创建 TransparentResultDecorator 实例
     }
     
     @Override

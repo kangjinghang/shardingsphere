@@ -32,7 +32,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Column meta data loader.
+ * Column meta data loader. 核心逻辑都是通过获取数据库连接Connection实例，然后通过其getMetaData()获得DatabaseMetaData实例，然后调用getSchemas、getTables、getColums等方法拿到对应的表与列信息
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ColumnMetaDataLoader {
@@ -63,7 +63,7 @@ public final class ColumnMetaDataLoader {
         List<String> columnTypeNames = new ArrayList<>();
         List<Boolean> isPrimaryKeys = new ArrayList<>();
         List<Boolean> isCaseSensitives = new ArrayList<>();
-        try (ResultSet resultSet = connection.getMetaData().getColumns(connection.getCatalog(), JdbcUtil.getSchema(connection, databaseType), table, "%")) {
+        try (ResultSet resultSet = connection.getMetaData().getColumns(connection.getCatalog(), JdbcUtil.getSchema(connection, databaseType), table, "%")) { // getMetaData().getColumns
             while (resultSet.next()) {
                 String columnName = resultSet.getString(COLUMN_NAME);
                 columnTypes.add(resultSet.getInt(DATA_TYPE));

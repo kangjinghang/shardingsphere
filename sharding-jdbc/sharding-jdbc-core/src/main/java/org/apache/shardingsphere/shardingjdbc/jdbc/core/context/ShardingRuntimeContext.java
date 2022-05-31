@@ -44,16 +44,16 @@ public final class ShardingRuntimeContext extends MultipleDataSourcesRuntimeCont
     private final CachedDatabaseMetaData cachedDatabaseMetaData;
     
     private final ShardingTransactionManagerEngine shardingTransactionManagerEngine;
-    
+    // 根据应用传入的 DataSource 的 map，然后生成 DataSourceMetas 与 SchemaMetaData 对象从而构建 ShardingSphereMetaData 实例，其中后者是需要真正的功能 RuntimeContext 类这种实现
     public ShardingRuntimeContext(final Map<String, DataSource> dataSourceMap, final ShardingRule shardingRule, final Properties props, final DatabaseType databaseType) throws SQLException {
         super(dataSourceMap, shardingRule, props, databaseType);
-        cachedDatabaseMetaData = createCachedDatabaseMetaData(dataSourceMap);
-        shardingTransactionManagerEngine = new ShardingTransactionManagerEngine();
+        cachedDatabaseMetaData = createCachedDatabaseMetaData(dataSourceMap); // 创建缓存元数据
+        shardingTransactionManagerEngine = new ShardingTransactionManagerEngine(); // 创建事务管理器
         shardingTransactionManagerEngine.init(databaseType, dataSourceMap);
     }
-    
+    // 创建缓存元数据
     private CachedDatabaseMetaData createCachedDatabaseMetaData(final Map<String, DataSource> dataSourceMap) throws SQLException {
-        try (Connection connection = dataSourceMap.values().iterator().next().getConnection()) {
+        try (Connection connection = dataSourceMap.values().iterator().next().getConnection()) { // 通过 Connection 缓存元数据
             return new CachedDatabaseMetaData(connection.getMetaData());
         }
     }

@@ -22,7 +22,7 @@ import org.apache.shardingsphere.shardingjdbc.jdbc.unsupported.AbstractUnsupport
 import org.apache.shardingsphere.sql.parser.SQLParserEngine;
 
 /**
- * Sharding parameter meta data.
+ * Sharding parameter meta data. 只实现了ParameterMetaData接口中getParameterCount，通过解析引擎获取到参数的数量。这个类实例会在ShardingPreparedStatement的构造函数中进行创建，以供getParameterMetaData()方法返回
  */
 @RequiredArgsConstructor
 public final class ShardingParameterMetaData extends AbstractUnsupportedOperationParameterMetaData {

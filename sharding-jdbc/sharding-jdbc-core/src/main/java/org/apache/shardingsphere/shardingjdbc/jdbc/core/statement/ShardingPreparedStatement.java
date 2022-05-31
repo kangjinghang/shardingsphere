@@ -107,23 +107,23 @@ public final class ShardingPreparedStatement extends AbstractShardingPreparedSta
         preparedStatementExecutor = new PreparedStatementExecutor(resultSetType, resultSetConcurrency, resultSetHoldability, returnGeneratedKeys, connection);
         batchPreparedStatementExecutor = new BatchPreparedStatementExecutor(resultSetType, resultSetConcurrency, resultSetHoldability, returnGeneratedKeys, connection);
     }
-    
+    // executeQuery、executeUpdate、execute方法中可以看到，其内部先执行了prepare方法，然后调用了StatementExecutor的executeQuery、executeUpdate、execute方法
     @Override
     public ResultSet executeQuery() throws SQLException {
         ResultSet result;
         try {
-            clearPrevious();
-            prepare();
+            clearPrevious(); // 重置 PreparedStatementExecutor
+            prepare(); // 完成prepare引擎的执行和自增key的生成添加
             initPreparedStatementExecutor();
             MergedResult mergedResult = mergeQuery(preparedStatementExecutor.executeQuery());
-            result = new ShardingResultSet(preparedStatementExecutor.getResultSets(), mergedResult, this, executionContext);
+            result = new ShardingResultSet(preparedStatementExecutor.getResultSets(), mergedResult, this, executionContext); // 使用 MergedResult 构建了 ShardingResultSet 返回
         } finally {
             clearBatch();
         }
         currentResultSet = result;
         return result;
     }
-    
+    // executeQuery、executeUpdate、execute方法中可以看到，其内部先执行了prepare方法，然后调用了StatementExecutor的executeQuery、executeUpdate、execute方法
     @Override
     public int executeUpdate() throws SQLException {
         try {
@@ -135,7 +135,7 @@ public final class ShardingPreparedStatement extends AbstractShardingPreparedSta
             clearBatch();
         }
     }
-    
+    // executeQuery、executeUpdate、execute方法中可以看到，其内部先执行了prepare方法，然后调用了StatementExecutor的executeQuery、executeUpdate、execute方法
     @Override
     public boolean execute() throws SQLException {
         try {
@@ -178,12 +178,12 @@ public final class ShardingPreparedStatement extends AbstractShardingPreparedSta
         }
         return result;
     }
-    
+    // 完成prepare引擎的执行和自增key的生成添加
     private void prepare() {
         executionContext = prepareEngine.prepare(sql, getParameters());
-        findGeneratedKey().ifPresent(generatedKey -> generatedValues.add(generatedKey.getGeneratedValues().getLast()));
+        findGeneratedKey().ifPresent(generatedKey -> generatedValues.add(generatedKey.getGeneratedValues().getLast())); // 将分布式自增key进行了添加
     }
-    
+    // 创建MergeEngine对象，执行merge方法
     private MergedResult mergeQuery(final List<QueryResult> queryResults) throws SQLException {
         ShardingRuntimeContext runtimeContext = connection.getRuntimeContext();
         MergeEngine mergeEngine = new MergeEngine(runtimeContext.getRule().toRules(), runtimeContext.getProperties(), runtimeContext.getDatabaseType(), runtimeContext.getMetaData().getSchema());
@@ -206,11 +206,11 @@ public final class ShardingPreparedStatement extends AbstractShardingPreparedSta
         return executionContext.getSqlStatementContext() instanceof InsertStatementContext
                 ? ((InsertStatementContext) executionContext.getSqlStatementContext()).getGeneratedKeyContext() : Optional.empty();
     }
-    
+    // 获取底层真实的 PreparedStatement ，然后设置对应的参数
     private void initPreparedStatementExecutor() throws SQLException {
-        preparedStatementExecutor.init(executionContext);
-        setParametersForStatements();
-        replayMethodForStatements();
+        preparedStatementExecutor.init(executionContext); // 初始化
+        setParametersForStatements(); // 设置 Statement 的参数
+        replayMethodForStatements(); // 对 statement 的一些方法进行回放设置
     }
     
     private void setParametersForStatements() {
@@ -224,7 +224,7 @@ public final class ShardingPreparedStatement extends AbstractShardingPreparedSta
             replayMethodsInvocation(each);
         }
     }
-    
+    // 重置 PreparedStatementExecutor，因为一个Statement可以多次执行多个SQL，每次执行完SQL，PreparedStatementExecutor 会记录真实的Statement，connection，该方法负责关闭statement，清理记录的参数、连接等
     private void clearPrevious() throws SQLException {
         preparedStatementExecutor.clear();
     }
@@ -254,7 +254,7 @@ public final class ShardingPreparedStatement extends AbstractShardingPreparedSta
         batchPreparedStatementExecutor.init(executionContext.getSqlStatementContext());
         setBatchParametersForStatements();
     }
-    
+    // 获取到 BatchPreparedStatementExecutor 内部的 Statement 和参数集合后，调用底层 PreparedStatement#addBatch 方法，添加批量参数
     private void setBatchParametersForStatements() throws SQLException {
         for (Statement each : batchPreparedStatementExecutor.getStatements()) {
             List<List<Object>> parameterSet = batchPreparedStatementExecutor.getParameterSet(each);

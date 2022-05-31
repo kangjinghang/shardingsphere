@@ -24,7 +24,7 @@ import org.apache.shardingsphere.sql.parser.binder.segment.select.pagination.Pag
 import java.sql.SQLException;
 
 /**
- * Decorator merged result for limit pagination.
+ * Decorator merged result for limit pagination. 分页的装饰器
  */
 public final class LimitDecoratorMergedResult extends DecoratorMergedResult {
     
@@ -42,7 +42,7 @@ public final class LimitDecoratorMergedResult extends DecoratorMergedResult {
     
     private boolean skipOffset() throws SQLException {
         for (int i = 0; i < pagination.getActualOffset(); i++) {
-            if (!getMergedResult().next()) {
+            if (!getMergedResult().next()) { // 如果结果集总概述小于 offset 值，设置 skipAll 为 true，表示跳过所有结果集，后续 next() 直接返回 false
                 return true;
             }
         }
@@ -57,7 +57,7 @@ public final class LimitDecoratorMergedResult extends DecoratorMergedResult {
         }
         if (!pagination.getActualRowCount().isPresent()) {
             return getMergedResult().next();
-        }
+        } // 由于改写了 offset，多个数据节点返回的结果集总数大于 SQL 中指定的 RowCount，因此在 next() 操作时要记录当前已返回的记录总数 rowNumber，同时要判断该值不能大于 SQL 指定的 RowCount
         return ++rowNumber <= pagination.getActualRowCount().get() && getMergedResult().next();
     }
 }

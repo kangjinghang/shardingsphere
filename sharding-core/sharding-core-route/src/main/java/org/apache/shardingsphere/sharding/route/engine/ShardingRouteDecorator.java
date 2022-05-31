@@ -48,7 +48,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Sharding route decorator.
+ * Sharding route decorator. 分库分表功能对应的数据分片路由装饰器
  */
 public final class ShardingRouteDecorator implements RouteDecorator<ShardingRule> {
     
@@ -57,29 +57,29 @@ public final class ShardingRouteDecorator implements RouteDecorator<ShardingRule
     public RouteContext decorate(final RouteContext routeContext, final ShardingSphereMetaData metaData, final ShardingRule shardingRule, final ConfigurationProperties properties) {
         SQLStatementContext sqlStatementContext = routeContext.getSqlStatementContext();
         List<Object> parameters = routeContext.getParameters();
-        ShardingStatementValidatorFactory.newInstance(
+        ShardingStatementValidatorFactory.newInstance(  // 对SQL进行验证，主要用于判断一些不支持的SQL，在分片功能中不支持INSERT INTO .... ON DUPLICATE KEY、不支持更新sharding key
                 sqlStatementContext.getSqlStatement()).ifPresent(validator -> validator.validate(shardingRule, sqlStatementContext.getSqlStatement(), parameters));
-        ShardingConditions shardingConditions = getShardingConditions(parameters, sqlStatementContext, metaData.getSchema(), shardingRule);
+        ShardingConditions shardingConditions = getShardingConditions(parameters, sqlStatementContext, metaData.getSchema(), shardingRule);  // 获取SQL的条件信息
         boolean needMergeShardingValues = isNeedMergeShardingValues(sqlStatementContext, shardingRule);
         if (sqlStatementContext.getSqlStatement() instanceof DMLStatement && needMergeShardingValues) {
-            checkSubqueryShardingValues(sqlStatementContext, shardingRule, shardingConditions);
-            mergeShardingConditions(shardingConditions);
+            checkSubqueryShardingValues(sqlStatementContext, shardingRule, shardingConditions); // 检查所有Sharding值（表、列、值）是不是相同，如果不相同则抛出异常
+            mergeShardingConditions(shardingConditions); // 剔除重复的sharding条件信息
         }
-        ShardingRouteEngine shardingRouteEngine = ShardingRouteEngineFactory.newInstance(shardingRule, metaData, sqlStatementContext, shardingConditions, properties);
-        RouteResult routeResult = shardingRouteEngine.route(shardingRule);
+        ShardingRouteEngine shardingRouteEngine = ShardingRouteEngineFactory.newInstance(shardingRule, metaData, sqlStatementContext, shardingConditions, properties); // 分片路由引擎工厂类创建分片路由引擎
+        RouteResult routeResult = shardingRouteEngine.route(shardingRule); // 进行路由，生成路由结果
         if (needMergeShardingValues) {
             Preconditions.checkState(1 == routeResult.getRouteUnits().size(), "Must have one sharding with subquery.");
         }
-        return new RouteContext(sqlStatementContext, parameters, routeResult);
+        return new RouteContext(sqlStatementContext, parameters, routeResult); // 创建新的RouteContext进行了返回
     }
-    
-    private ShardingConditions getShardingConditions(final List<Object> parameters, 
+    // 创建 SQL 的条件信息
+    private ShardingConditions getShardingConditions(final List<Object> parameters,
                                                      final SQLStatementContext sqlStatementContext, final SchemaMetaData schemaMetaData, final ShardingRule shardingRule) {
         if (sqlStatementContext.getSqlStatement() instanceof DMLStatement) {
-            if (sqlStatementContext instanceof InsertStatementContext) {
+            if (sqlStatementContext instanceof InsertStatementContext) {  // 根据insert values 中信息创建分片条件信息
                 return new ShardingConditions(new InsertClauseShardingConditionEngine(shardingRule).createShardingConditions((InsertStatementContext) sqlStatementContext, parameters));
             }
-            return new ShardingConditions(new WhereClauseShardingConditionEngine(shardingRule, schemaMetaData).createShardingConditions(sqlStatementContext, parameters));
+            return new ShardingConditions(new WhereClauseShardingConditionEngine(shardingRule, schemaMetaData).createShardingConditions(sqlStatementContext, parameters)); // 根据 where 条件中信息创建分片条件信息
         }
         return new ShardingConditions(Collections.emptyList());
     }

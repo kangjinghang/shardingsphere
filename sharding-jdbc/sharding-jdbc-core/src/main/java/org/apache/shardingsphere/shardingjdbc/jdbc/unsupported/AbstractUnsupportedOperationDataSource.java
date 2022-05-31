@@ -24,10 +24,10 @@ import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
 
 /**
- * Unsupported {@code Datasource} methods.
+ * Unsupported {@code Datasource} methods. 各 DataSource 实现类的基类
  */
 public abstract class AbstractUnsupportedOperationDataSource extends WrapperAdapter implements DataSource {
-    
+    // 这两方法在其子类各功能的 DataSource 实现类中都未进行重写，所以 ShardingSphere 明确了不支持这两个方法的调用
     @Override
     public final int getLoginTimeout() throws SQLException {
         throw new SQLFeatureNotSupportedException("unsupported getLoginTimeout()");

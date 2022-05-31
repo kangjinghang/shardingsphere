@@ -27,7 +27,7 @@ import org.apache.shardingsphere.underlying.rewrite.context.SQLRewriteContextDec
 import org.apache.shardingsphere.underlying.rewrite.parameter.rewriter.ParameterRewriter;
 
 /**
- * SQL rewrite context decorator for encrypt.
+ * SQL rewrite context decorator for encrypt. 加密SQL重写装饰器
  */
 public final class EncryptSQLRewriteContextDecorator implements SQLRewriteContextDecorator<EncryptRule> {
     

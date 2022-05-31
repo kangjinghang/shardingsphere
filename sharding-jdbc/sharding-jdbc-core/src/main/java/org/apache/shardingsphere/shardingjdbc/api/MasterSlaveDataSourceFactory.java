@@ -29,7 +29,7 @@ import java.util.Map;
 import java.util.Properties;
 
 /**
- * Master-slave data source factory.
+ * Master-slave data source factory. 读写分离 DataSource 工厂类
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class MasterSlaveDataSourceFactory {

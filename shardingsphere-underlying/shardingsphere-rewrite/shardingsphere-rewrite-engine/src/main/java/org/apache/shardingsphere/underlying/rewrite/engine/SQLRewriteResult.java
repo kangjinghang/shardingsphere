@@ -28,7 +28,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Getter
 public final class SQLRewriteResult {
-    
+    // 改写后的SQL
     private final String sql;
     
     private final List<Object> parameters;

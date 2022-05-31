@@ -30,7 +30,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * Sharding generated key insert value parameter rewriter.
+ * Sharding generated key insert value parameter rewriter. insert分布式自增参数重写
  */
 @Setter
 public final class ShardingGeneratedKeyInsertValueParameterRewriter implements ParameterRewriter<InsertStatementContext> {

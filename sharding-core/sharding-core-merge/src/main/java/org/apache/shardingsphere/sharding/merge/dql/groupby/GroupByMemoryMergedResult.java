@@ -44,7 +44,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 /**
- * Memory merged result for group by.
+ * Memory merged result for group by. 基于内存模式归并的合并结果集类
  */
 public final class GroupByMemoryMergedResult extends MemoryMergedResult<ShardingRule> {
     
@@ -58,14 +58,14 @@ public final class GroupByMemoryMergedResult extends MemoryMergedResult<Sharding
         SelectStatementContext selectStatementContext = (SelectStatementContext) sqlStatementContext;
         Map<GroupByValue, MemoryQueryResultRow> dataMap = new HashMap<>(1024);
         Map<GroupByValue, Map<AggregationProjection, AggregationUnit>> aggregationMap = new HashMap<>(1024);
-        for (QueryResult each : queryResults) {
+        for (QueryResult each : queryResults) { // 遍历所有结果集元素，然后进行聚合运算
             while (each.next()) {
                 GroupByValue groupByValue = new GroupByValue(each, selectStatementContext.getGroupByContext().getItems());
-                initForFirstGroupByValue(selectStatementContext, each, groupByValue, dataMap, aggregationMap);
-                aggregate(selectStatementContext, each, groupByValue, aggregationMap);
+                initForFirstGroupByValue(selectStatementContext, each, groupByValue, dataMap, aggregationMap); // 初始化创建GroupByValue 对应的 AggregationUnit
+                aggregate(selectStatementContext, each, groupByValue, aggregationMap); // 对各分组进行聚合计算
             }
         }
-        setAggregationValueToMemoryRow(selectStatementContext, dataMap, aggregationMap);
+        setAggregationValueToMemoryRow(selectStatementContext, dataMap, aggregationMap); // 将计算的值设置到 aggregationMap
         List<Boolean> valueCaseSensitive = queryResults.isEmpty() ? Collections.emptyList() : getValueCaseSensitive(queryResults.iterator().next(), selectStatementContext, schemaMetaData);
         return getMemoryResultSetRows(selectStatementContext, dataMap, valueCaseSensitive);
     }
@@ -134,7 +134,7 @@ public final class GroupByMemoryMergedResult extends MemoryMergedResult<Sharding
         }
         return false;
     }
-    
+    // 将 aggregationMap 中值排序后生成 List<MemoryQueryResultRow> 集合，此及时作为内存合并结果的内部数据类
     private List<MemoryQueryResultRow> getMemoryResultSetRows(final SelectStatementContext selectStatementContext, 
                                                               final Map<GroupByValue, MemoryQueryResultRow> dataMap, final List<Boolean> valueCaseSensitive) {
         List<MemoryQueryResultRow> result = new ArrayList<>(dataMap.values());

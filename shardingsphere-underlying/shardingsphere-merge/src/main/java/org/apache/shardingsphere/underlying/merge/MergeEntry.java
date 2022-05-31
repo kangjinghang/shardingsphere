@@ -40,7 +40,7 @@ import java.util.Map.Entry;
 import java.util.Optional;
 
 /**
- * Merge entry.
+ * Merge entry. 内部真正进行处理合并的类
  */
 @RequiredArgsConstructor
 public final class MergeEntry {
@@ -72,11 +72,11 @@ public final class MergeEntry {
      * @throws SQLException SQL exception
      */
     public MergedResult process(final List<QueryResult> queryResults, final SQLStatementContext sqlStatementContext) throws SQLException {
-        Optional<MergedResult> mergedResult = merge(queryResults, sqlStatementContext);
+        Optional<MergedResult> mergedResult = merge(queryResults, sqlStatementContext); // 调用了本地私有方法 merge
         Optional<MergedResult> result = mergedResult.isPresent() ? Optional.of(decorate(mergedResult.get(), sqlStatementContext)) : decorate(queryResults.get(0), sqlStatementContext);
         return result.orElseGet(() -> new TransparentMergedResult(queryResults.get(0)));
     }
-    
+    // 顺序执行 ResultMergerEngine 实现类的 newInstance 方法创建 ResultMerger 实例，然后执行其 merge 方法生成合并结果集 MergedResult 实例
     @SuppressWarnings("unchecked")
     private Optional<MergedResult> merge(final List<QueryResult> queryResults, final SQLStatementContext sqlStatementContext) throws SQLException {
         for (Entry<BaseRule, ResultProcessEngine> entry : engines.entrySet()) {
@@ -87,7 +87,7 @@ public final class MergeEntry {
         }
         return Optional.empty();
     }
-    
+    // 遍历拿到注册的 ResultDecoratorEngine，依次调用其 newInstance 创建 ResultDecorator 实例，然后执行其 decorate 方法，对 MergedResult 进行二次处理
     @SuppressWarnings("unchecked")
     private MergedResult decorate(final MergedResult mergedResult, final SQLStatementContext sqlStatementContext) throws SQLException {
         MergedResult result = null;

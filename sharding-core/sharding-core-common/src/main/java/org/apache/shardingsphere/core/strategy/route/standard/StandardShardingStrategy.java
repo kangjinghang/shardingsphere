@@ -34,7 +34,7 @@ import java.util.LinkedList;
 import java.util.TreeSet;
 
 /**
- * Standard sharding strategy.
+ * Standard sharding strategy. 标准分片策略，创建时需要提供StandardShardingStrategyConfiguration实例，即应用负责的分片策略配置类（如果采用spring xml或者yaml方式，ShardingSphere会负责自动创建该类，如果基于JAVA API方式，则需要应用自行进行创建此类）
  */
 public final class StandardShardingStrategy implements ShardingStrategy {
     
@@ -48,8 +48,8 @@ public final class StandardShardingStrategy implements ShardingStrategy {
         Preconditions.checkNotNull(standardShardingStrategyConfig.getShardingColumn(), "Sharding column cannot be null.");
         Preconditions.checkNotNull(standardShardingStrategyConfig.getPreciseShardingAlgorithm(), "precise sharding algorithm cannot be null.");
         shardingColumn = standardShardingStrategyConfig.getShardingColumn();
-        preciseShardingAlgorithm = standardShardingStrategyConfig.getPreciseShardingAlgorithm();
-        rangeShardingAlgorithm = standardShardingStrategyConfig.getRangeShardingAlgorithm();
+        preciseShardingAlgorithm = standardShardingStrategyConfig.getPreciseShardingAlgorithm(); // 应用要提供实现 PreciseShardingAlgorithm 接口的类
+        rangeShardingAlgorithm = standardShardingStrategyConfig.getRangeShardingAlgorithm(); // 应用要提供实现 RangeShardingAlgorithm 接口的类
     }
     
     @Override
@@ -67,14 +67,14 @@ public final class StandardShardingStrategy implements ShardingStrategy {
         if (null == rangeShardingAlgorithm) {
             throw new UnsupportedOperationException("Cannot find range sharding strategy in sharding rule.");
         }
-        return rangeShardingAlgorithm.doSharding(availableTargetNames, 
+        return rangeShardingAlgorithm.doSharding(availableTargetNames,  // RangeShardingAlgorithm
                 new RangeShardingValue(shardingValue.getTableName(), shardingValue.getColumnName(), shardingValue.getValueRange()));
     }
     
     @SuppressWarnings("unchecked")
     private Collection<String> doSharding(final Collection<String> availableTargetNames, final ListRouteValue<?> shardingValue) {
         Collection<String> result = new LinkedList<>();
-        for (Comparable<?> each : shardingValue.getValues()) {
+        for (Comparable<?> each : shardingValue.getValues()) { // PreciseShardingAlgorithm
             String target = preciseShardingAlgorithm.doSharding(availableTargetNames, new PreciseShardingValue(shardingValue.getTableName(), shardingValue.getColumnName(), each));
             if (null != target) {
                 result.add(target);

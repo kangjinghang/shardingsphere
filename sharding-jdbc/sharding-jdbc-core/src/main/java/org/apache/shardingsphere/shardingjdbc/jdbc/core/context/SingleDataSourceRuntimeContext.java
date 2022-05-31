@@ -35,7 +35,7 @@ import java.util.Map;
 import java.util.Properties;
 
 /**
- * Runtime context for single data source.
+ * Runtime context for single data source. 单个数据源
  *
  * @param <T> type of rule
  */

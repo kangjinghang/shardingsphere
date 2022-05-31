@@ -93,11 +93,11 @@ public final class SelectStatementContext extends CommonSQLStatementContext<Sele
     
     public SelectStatementContext(final SchemaMetaData schemaMetaData, final String sql, final List<Object> parameters, final SelectStatement sqlStatement) {
         super(sqlStatement);
-        tablesContext = new TablesContext(sqlStatement.getSimpleTableSegments());
-        groupByContext = new GroupByContextEngine().createGroupByContext(sqlStatement);
-        orderByContext = new OrderByContextEngine().createOrderBy(sqlStatement, groupByContext);
-        projectionsContext = new ProjectionsContextEngine(schemaMetaData).createProjectionsContext(sql, sqlStatement, groupByContext, orderByContext);
-        paginationContext = new PaginationContextEngine().createPaginationContext(sqlStatement, projectionsContext, parameters);
+        tablesContext = new TablesContext(sqlStatement.getSimpleTableSegments()); // 创建表名上下文
+        groupByContext = new GroupByContextEngine().createGroupByContext(sqlStatement); // 创建group by上下文
+        orderByContext = new OrderByContextEngine().createOrderBy(sqlStatement, groupByContext); // 创建order by上下文
+        projectionsContext = new ProjectionsContextEngine(schemaMetaData).createProjectionsContext(sql, sqlStatement, groupByContext, orderByContext); // 创建projection上下文
+        paginationContext = new PaginationContextEngine().createPaginationContext(sqlStatement, projectionsContext, parameters); // 创建分页上下文
         containsSubquery = containsSubquery();
     }
     
@@ -113,7 +113,7 @@ public final class SelectStatementContext extends CommonSQLStatementContext<Sele
     }
     
     /**
-     * Set indexes.
+     * Set indexes. 进行聚合projecttion、group by、order by设置其对应的columnLabel所在位置下标，这些下标会在GroupByStreamMergedResult的等类中访问
      *
      * @param columnLabelIndexMap map for column label and index
      */

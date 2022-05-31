@@ -23,7 +23,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
 /**
- * Index meta data.
+ * Index meta data. 索引元数据
  */
 @RequiredArgsConstructor
 @Getter

@@ -45,7 +45,7 @@ import java.util.Map.Entry;
  * Adapter for {@code Connection}.
  */
 public abstract class AbstractConnectionAdapter extends AbstractUnsupportedOperationConnection {
-    
+    // Multimap类型，因为同一数据源可能生成多个数据库连接
     @Getter
     private final Multimap<String, Connection> cachedConnections = LinkedHashMultimap.create();
     
@@ -80,7 +80,7 @@ public abstract class AbstractConnectionAdapter extends AbstractUnsupportedOpera
     }
     
     /**
-     * Get database connections.
+     * Get database connections. 根据 cachedConnections 已有的连接和目标连接数，如果小于目标连接数，则创建相差的连接
      *
      * @param connectionMode connection mode
      * @param dataSourceName data source name
@@ -101,7 +101,7 @@ public abstract class AbstractConnectionAdapter extends AbstractUnsupportedOpera
         } else if (!connections.isEmpty()) {
             result = new ArrayList<>(connectionSize);
             result.addAll(connections);
-            List<Connection> newConnections = createConnections(dataSourceName, connectionMode, dataSource, connectionSize - connections.size());
+            List<Connection> newConnections = createConnections(dataSourceName, connectionMode, dataSource, connectionSize - connections.size()); // 如果小于目标连接数，则创建相差的连接
             result.addAll(newConnections);
             synchronized (cachedConnections) {
                 cachedConnections.putAll(dataSourceName, newConnections);
@@ -200,12 +200,12 @@ public abstract class AbstractConnectionAdapter extends AbstractUnsupportedOpera
     public final boolean isReadOnly() {
         return readOnly;
     }
-    
+    // recordMethodInvocation 方法是为了后续新建的连接都能通过回放已设置的属性
     @Override
     public final void setReadOnly(final boolean readOnly) throws SQLException {
         this.readOnly = readOnly;
         recordMethodInvocation(Connection.class, "setReadOnly", new Class[]{boolean.class}, new Object[]{readOnly});
-        forceExecuteTemplate.execute(cachedConnections.values(), connection -> connection.setReadOnly(readOnly));
+        forceExecuteTemplate.execute(cachedConnections.values(), connection -> connection.setReadOnly(readOnly)); // 将已创建的连接分别设置该属性值
     }
     
     @Override

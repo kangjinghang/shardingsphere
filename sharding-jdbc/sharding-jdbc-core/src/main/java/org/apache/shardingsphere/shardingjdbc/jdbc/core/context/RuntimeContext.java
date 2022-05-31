@@ -24,7 +24,7 @@ import org.apache.shardingsphere.underlying.common.rule.BaseRule;
 import org.apache.shardingsphere.spi.database.type.DatabaseType;
 
 /**
- * Runtime context.
+ * Runtime context. 作为各 JDBC 各资源对象间传递的一个上下文对象，其定义了对应规则、属性、数据库类型、执行引擎以及 SQL 解析引
  *
  * @param <T> type of rule
  */

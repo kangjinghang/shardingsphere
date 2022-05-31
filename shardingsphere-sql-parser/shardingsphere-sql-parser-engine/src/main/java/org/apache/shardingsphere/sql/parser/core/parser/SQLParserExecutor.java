@@ -39,7 +39,7 @@ public final class SQLParserExecutor {
     private final String sql;
     
     /**
-     * Execute to parse SQL.
+     * Execute to parse SQL. 生成解析树 ParseASTNode【真正解析】
      *
      * @return AST node
      */
@@ -52,7 +52,7 @@ public final class SQLParserExecutor {
     }
     
     private ParseASTNode towPhaseParse() {
-        SQLParser sqlParser = SQLParserFactory.newInstance(databaseTypeName, sql);
+        SQLParser sqlParser = SQLParserFactory.newInstance(databaseTypeName, sql); // 创建该类型数据库对应的SQL解析器，由其工厂类SQLParserFactory类负责创建。
         try {
             ((Parser) sqlParser).setErrorHandler(new BailErrorStrategy());
             ((Parser) sqlParser).getInterpreter().setPredictionMode(PredictionMode.SLL);

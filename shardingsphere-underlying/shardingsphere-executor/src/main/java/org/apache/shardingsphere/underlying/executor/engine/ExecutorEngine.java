@@ -58,7 +58,7 @@ public final class ExecutorEngine implements AutoCloseable {
     
     /**
      * Execute.
-     *
+     * 分为串行执行和并行执行两种方式，同步就在当前线程中执行callback逻辑，异步就在线程池中执行。而callback即为PreparedStatementExecutor类中executeQuery()所定义。
      * @param inputGroups input groups
      * @param firstCallback first grouped callback
      * @param callback other grouped callback
@@ -75,7 +75,7 @@ public final class ExecutorEngine implements AutoCloseable {
         }
         return serial ? serialExecute(inputGroups, firstCallback, callback) : parallelExecute(inputGroups, firstCallback, callback);
     }
-    
+    // 串行执行
     private <I, O> List<O> serialExecute(final Collection<InputGroup<I>> inputGroups, final GroupedCallback<I, O> firstCallback, final GroupedCallback<I, O> callback) throws SQLException {
         Iterator<InputGroup<I>> inputGroupsIterator = inputGroups.iterator();
         InputGroup<I> firstInputs = inputGroupsIterator.next();
@@ -85,7 +85,7 @@ public final class ExecutorEngine implements AutoCloseable {
         }
         return result;
     }
-    
+    // 并行执行，可以支持两个回调函数，第一条记录执行第一个回调函数，其它的执行第二个回调函数
     private <I, O> List<O> parallelExecute(final Collection<InputGroup<I>> inputGroups, final GroupedCallback<I, O> firstCallback, final GroupedCallback<I, O> callback) throws SQLException {
         Iterator<InputGroup<I>> inputGroupsIterator = inputGroups.iterator();
         InputGroup<I> firstInputs = inputGroupsIterator.next();

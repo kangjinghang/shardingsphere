@@ -26,7 +26,7 @@ import org.apache.shardingsphere.underlying.rewrite.context.SQLRewriteContextDec
 import org.apache.shardingsphere.underlying.rewrite.parameter.rewriter.ParameterRewriter;
 
 /**
- * SQL rewrite context decorator for shadow.
+ * SQL rewrite context decorator for shadow. 影子表SQL重写装饰器
  */
 public final class ShadowSQLRewriteContextDecorator implements SQLRewriteContextDecorator<ShadowRule> {
     

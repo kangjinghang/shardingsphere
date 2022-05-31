@@ -36,13 +36,13 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 /**
- * Adapter for {@code Datasource}.
+ * Adapter for {@code Datasource}. 抽象的 DataSource 适配器类
  */
 @Getter
 public abstract class AbstractDataSourceAdapter extends AbstractUnsupportedOperationDataSource implements AutoCloseable {
     
     private final Map<String, DataSource> dataSourceMap;
-    
+    // 维护了一个真实 DataSource
     private final DatabaseType databaseType;
     
     @Setter
@@ -114,6 +114,6 @@ public abstract class AbstractDataSourceAdapter extends AbstractUnsupportedOpera
         } catch (final ReflectiveOperationException ignored) {
         }
     }
-    
+    // RuntimeContext 作为各 JDBC 各资源对象间传递的一个上下文对象，其定义了对应规则、属性、数据库类型、执行引擎以及 SQL 解析引擎
     protected abstract RuntimeContext getRuntimeContext();
 }

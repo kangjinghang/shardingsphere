@@ -54,32 +54,32 @@ public final class PreparedStatementExecutor extends AbstractStatementExecutor {
     }
     
     /**
-     * Initialize executor.
+     * Initialize executor. 获取底层真实的 PreparedStatement
      *
      * @param executionContext execution context
      * @throws SQLException SQL exception
      */
     public void init(final ExecutionContext executionContext) throws SQLException {
         setSqlStatementContext(executionContext.getSqlStatementContext());
-        getInputGroups().addAll(obtainExecuteGroups(executionContext.getExecutionUnits()));
+        getInputGroups().addAll(obtainExecuteGroups(executionContext.getExecutionUnits())); // 对执行单元进行分组
         cacheStatements();
     }
-    
+    // 将输入的 ExecutionUnit 集合和 SQLExecutePrepareCallback 生成 InputGroup<StatementExecuteUnit> 集合
     private Collection<InputGroup<StatementExecuteUnit>> obtainExecuteGroups(final Collection<ExecutionUnit> executionUnits) throws SQLException {
         return getSqlExecutePrepareTemplate().getExecuteUnitGroups(executionUnits, new SQLExecutePrepareCallback() {
-            
+            // 在指定数据源上创建要求数量的数据库连接
             @Override
             public List<Connection> getConnections(final ConnectionMode connectionMode, final String dataSourceName, final int connectionSize) throws SQLException {
                 return PreparedStatementExecutor.super.getConnection().getConnections(connectionMode, dataSourceName, connectionSize);
             }
-            
+            // 根据执行单元信息 创建 Statement 执行单元对象
             @Override
             public StatementExecuteUnit createStatementExecuteUnit(final Connection connection, final ExecutionUnit executionUnit, final ConnectionMode connectionMode) throws SQLException {
                 return new StatementExecuteUnit(executionUnit, createPreparedStatement(connection, executionUnit.getSqlUnit().getSql()), connectionMode);
             }
         });
     }
-    
+    // 创建底层真实的 PreparedStatement
     @SuppressWarnings("MagicConstant")
     private PreparedStatement createPreparedStatement(final Connection connection, final String sql) throws SQLException {
         return returnGeneratedKeys ? connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)
@@ -87,7 +87,7 @@ public final class PreparedStatementExecutor extends AbstractStatementExecutor {
     }
     
     /**
-     * Execute query.
+     * Execute query. 执行查询
      *
      * @return result set list
      * @throws SQLException SQL exception
@@ -95,15 +95,15 @@ public final class PreparedStatementExecutor extends AbstractStatementExecutor {
     public List<QueryResult> executeQuery() throws SQLException {
         final boolean isExceptionThrown = ExecutorExceptionHandler.isExceptionThrown();
         SQLExecuteCallback<QueryResult> executeCallback = new SQLExecuteCallback<QueryResult>(getDatabaseType(), isExceptionThrown) {
-            
+            // 在指定的 Statement 上执行SQL，将JDBC结果集包装成查询QueryResult对象（有基于流模式、基于内存模式两类）
             @Override
             protected QueryResult executeSQL(final String sql, final Statement statement, final ConnectionMode connectionMode) throws SQLException {
                 return getQueryResult(statement, connectionMode);
             }
         };
-        return executeCallback(executeCallback);
+        return executeCallback(executeCallback); // 通过 父类 executeCallback 方法操作
     }
-    
+    // 执行SQL，然后将结果集转成QueryResult对象
     private QueryResult getQueryResult(final Statement statement, final ConnectionMode connectionMode) throws SQLException {
         PreparedStatement preparedStatement = (PreparedStatement) statement;
         ResultSet resultSet = preparedStatement.executeQuery();

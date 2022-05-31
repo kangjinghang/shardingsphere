@@ -34,7 +34,7 @@ import java.sql.Timestamp;
 import java.util.Calendar;
 
 /**
- * Unsupported Database meta data result set.
+ * Unsupported Database meta data result set. 定义了DatabaseMetaData不支持的方法（ShardingDatabaseMetaData中getSchemas、getColumns等方法的返回值）
  */
 public abstract class AbstractUnsupportedDatabaseMetaDataResultSet extends AbstractUnsupportedOperationResultSet {
     

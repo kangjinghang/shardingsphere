@@ -26,7 +26,7 @@ import org.apache.shardingsphere.sql.parser.sql.statement.dml.SelectStatement;
 import java.util.ArrayList;
 
 /**
- * Data source router for master-slave.
+ * Data source router for master-slave. 计算路由到具体哪个数据库
  */
 @RequiredArgsConstructor
 public final class MasterSlaveDataSourceRouter {
@@ -34,24 +34,24 @@ public final class MasterSlaveDataSourceRouter {
     private final MasterSlaveRule masterSlaveRule;
     
     /**
-     * Route.
+     * Route. 计算路由到具体哪个数据库
      * 
      * @param sqlStatement SQL statement
      * @return data source name
      */
     public String route(final SQLStatement sqlStatement) {
-        if (isMasterRoute(sqlStatement)) {
+        if (isMasterRoute(sqlStatement)) { // 需要路由到主库(SQL中包含锁例如select for update、非select、通过hint指定主库路由)
             MasterVisitedManager.setMasterVisited();
-            return masterSlaveRule.getMasterDataSourceName();
+            return masterSlaveRule.getMasterDataSourceName(); // 真正的负责执行
         }
-        return masterSlaveRule.getLoadBalanceAlgorithm().getDataSource(
+        return masterSlaveRule.getLoadBalanceAlgorithm().getDataSource( // 根据负载均衡算法计算要访问的数据源
                 masterSlaveRule.getName(), masterSlaveRule.getMasterDataSourceName(), new ArrayList<>(masterSlaveRule.getSlaveDataSourceNames()));
     }
-    
+    // select for update || 非select || 通过hint指定主库路由
     private boolean isMasterRoute(final SQLStatement sqlStatement) {
         return containsLockSegment(sqlStatement) || !(sqlStatement instanceof SelectStatement) || MasterVisitedManager.isMasterVisited() || HintManager.isMasterRouteOnly();
     }
-    
+    // select for update
     private boolean containsLockSegment(final SQLStatement sqlStatement) {
         return sqlStatement instanceof SelectStatement && ((SelectStatement) sqlStatement).getLock().isPresent();
     }

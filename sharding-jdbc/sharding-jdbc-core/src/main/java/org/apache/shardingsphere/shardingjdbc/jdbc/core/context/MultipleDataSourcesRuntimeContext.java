@@ -36,7 +36,7 @@ import java.util.Map.Entry;
 import java.util.Properties;
 
 /**
- * Runtime context for multiple data sources.
+ * Runtime context for multiple data sources. 多个数据源
  *
  * @param <T> type of rule
  */
@@ -53,9 +53,9 @@ public abstract class MultipleDataSourcesRuntimeContext<T extends BaseRule> exte
     
     private ShardingSphereMetaData createMetaData(final Map<String, DataSource> dataSourceMap, final DatabaseType databaseType) throws SQLException {
         long start = System.currentTimeMillis();
-        DataSourceMetas dataSourceMetas = new DataSourceMetas(databaseType, getDatabaseAccessConfigurationMap(dataSourceMap));
-        SchemaMetaData schemaMetaData = loadSchemaMetaData(dataSourceMap);
-        ShardingSphereMetaData result = new ShardingSphereMetaData(dataSourceMetas, schemaMetaData);
+        DataSourceMetas dataSourceMetas = new DataSourceMetas(databaseType, getDatabaseAccessConfigurationMap(dataSourceMap)); // 生成 DataSourceMetas
+        SchemaMetaData schemaMetaData = loadSchemaMetaData(dataSourceMap); // 生成 SchemaMetaData
+        ShardingSphereMetaData result = new ShardingSphereMetaData(dataSourceMetas, schemaMetaData); // 构建 ShardingSphereMetaData 实例
         log.info("Meta data load finished, cost {} milliseconds.", System.currentTimeMillis() - start);
         return result;
     }

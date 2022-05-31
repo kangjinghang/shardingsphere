@@ -39,7 +39,7 @@ import java.util.Optional;
 public final class ConditionValueGeneratorFactory {
     
     /**
-     * Generate condition value.
+     * Generate condition value.  根据运算符创建对应的路由值，=、in为ListRouteValue类型，>、<、between等范围型为RangeRouteValue类型
      *
      * @param predicateRightValue predicate right value
      * @param column column

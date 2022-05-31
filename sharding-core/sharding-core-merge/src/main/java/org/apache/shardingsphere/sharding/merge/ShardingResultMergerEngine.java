@@ -33,13 +33,13 @@ import org.apache.shardingsphere.underlying.merge.engine.merger.impl.Transparent
  * Result merger engine for sharding.
  */
 public final class ShardingResultMergerEngine implements ResultMergerEngine<ShardingRule> {
-    
+    // 根据当前 SQL 的类型创建对应的 ResultMerger 实例
     @Override
     public ResultMerger newInstance(final DatabaseType databaseType, final ShardingRule shardingRule, final ConfigurationProperties properties, final SQLStatementContext sqlStatementContext) {
-        if (sqlStatementContext instanceof SelectStatementContext) {
+        if (sqlStatementContext instanceof SelectStatementContext) { // 如果是 SQL 是 Select，则创建 ShardingDQLResultMerger 对象
             return new ShardingDQLResultMerger(databaseType);
         } 
-        if (sqlStatementContext.getSqlStatement() instanceof DALStatement) {
+        if (sqlStatementContext.getSqlStatement() instanceof DALStatement) { // 如果是 DAL 语句(show database、show table 等)，则创建 ShardingDALResultMerger 对象
             return new ShardingDALResultMerger(shardingRule);
         }
         return new TransparentResultMerger();
@@ -49,7 +49,7 @@ public final class ShardingResultMergerEngine implements ResultMergerEngine<Shar
     public int getOrder() {
         return 0;
     }
-    
+    // ShardingRule.class
     @Override
     public Class<ShardingRule> getType() {
         return ShardingRule.class;

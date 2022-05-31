@@ -24,7 +24,7 @@ import java.sql.DatabaseMetaData;
 import java.sql.RowIdLifetime;
 
 /**
- * Adapted database meta data.
+ * Adapted database meta data. 对 DatabaseMetaData 方法进行了实现，都是直接调用 CachedDatabaseMetaData 实例对应方法直接返回
  */
 @RequiredArgsConstructor
 public abstract class AdaptedDatabaseMetaData extends WrapperAdapter implements DatabaseMetaData {

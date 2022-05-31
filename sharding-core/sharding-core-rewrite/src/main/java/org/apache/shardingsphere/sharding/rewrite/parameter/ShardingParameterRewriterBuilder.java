@@ -41,7 +41,7 @@ public final class ShardingParameterRewriterBuilder implements ParameterRewriter
     private final ShardingRule shardingRule;
     
     private final RouteContext routeContext;
-    
+    // 创建了数据分片功能对应的参数改写器，包括了 insert 自增分布式主键参数和分页参数两个重写器
     @Override
     public Collection<ParameterRewriter> getParameterRewriters(final SchemaMetaData schemaMetaData) {
         Collection<ParameterRewriter> result = getParameterRewriters();
@@ -53,8 +53,8 @@ public final class ShardingParameterRewriterBuilder implements ParameterRewriter
     
     private static Collection<ParameterRewriter> getParameterRewriters() {
         Collection<ParameterRewriter> result = new LinkedList<>();
-        result.add(new ShardingGeneratedKeyInsertValueParameterRewriter());
-        result.add(new ShardingPaginationParameterRewriter());
+        result.add(new ShardingGeneratedKeyInsertValueParameterRewriter()); // insert分布式自增参数重写
+        result.add(new ShardingPaginationParameterRewriter()); // 分页参数重写
         return result;
     }
     

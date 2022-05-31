@@ -32,7 +32,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 /**
- * Sharding result set meta data.
+ * Sharding result set meta data. 大多数方法逻辑就是调用构造函数传入的ResultSetMetaData对应方法，其它有一些则进行了物理表名与逻辑表名的转换和扩展projection的判断等。ResultSetMetaData的传入则是在AbstractResultSetAdapter中取的第一个内部底层ResultSet。
  */
 @RequiredArgsConstructor
 public final class ShardingResultSetMetaData extends WrapperAdapter implements ResultSetMetaData {

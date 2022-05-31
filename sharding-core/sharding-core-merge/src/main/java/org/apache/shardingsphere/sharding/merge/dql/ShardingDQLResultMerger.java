@@ -45,7 +45,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 /**
- * DQL result merger for Sharding.
+ * DQL result merger for Sharding. 最常见的Select类的结果合并器
  */
 @RequiredArgsConstructor
 public final class ShardingDQLResultMerger implements ResultMerger {
@@ -57,11 +57,11 @@ public final class ShardingDQLResultMerger implements ResultMerger {
         if (1 == queryResults.size()) {
             return new IteratorStreamMergedResult(queryResults);
         }
-        Map<String, Integer> columnLabelIndexMap = getColumnLabelIndexMap(queryResults.get(0));
+        Map<String, Integer> columnLabelIndexMap = getColumnLabelIndexMap(queryResults.get(0)); // 生成 columnLabel 位置下标的 Map
         SelectStatementContext selectStatementContext = (SelectStatementContext) sqlStatementContext;
-        selectStatementContext.setIndexes(columnLabelIndexMap);
-        MergedResult mergedResult = build(queryResults, selectStatementContext, columnLabelIndexMap, schemaMetaData);
-        return decorate(queryResults, selectStatementContext, mergedResult);
+        selectStatementContext.setIndexes(columnLabelIndexMap); // 进行聚合 projecttion、group by、order by 设置其对应的columnLabel所在位置下标，这些下标会在GroupByStreamMergedResult的等类中访问
+        MergedResult mergedResult = build(queryResults, selectStatementContext, columnLabelIndexMap, schemaMetaData); // 生成合并结果集
+        return decorate(queryResults, selectStatementContext, mergedResult); // 对合并结果集进行装饰处理
     }
     
     private Map<String, Integer> getColumnLabelIndexMap(final QueryResult queryResult) throws SQLException {
@@ -71,7 +71,7 @@ public final class ShardingDQLResultMerger implements ResultMerger {
         }
         return result;
     }
-    
+    // 判断 SQL 中是否包含 group by、distinct row 和 order by，然后构建 GroupByStreamMergedResult 或者 GroupByMemoryMergedResult、OrderByStreamMergedResult
     private MergedResult build(final List<QueryResult> queryResults, final SelectStatementContext selectStatementContext,
                                final Map<String, Integer> columnLabelIndexMap, final SchemaMetaData schemaMetaData) throws SQLException {
         if (isNeedProcessGroupBy(selectStatementContext)) {
@@ -102,7 +102,7 @@ public final class ShardingDQLResultMerger implements ResultMerger {
             selectStatementContext.getGroupByContext().getItems().add(orderByItem);
         }
     }
-    
+    // 判断 group by 与 order by 的列是否一样，如果是则创建 GroupByStreamMergedResult 实例，否则创建 GroupByMemoryMergedResult 实例，前者为基于流方式，后者为基于内存方式
     private MergedResult getGroupByMergedResult(final List<QueryResult> queryResults, final SelectStatementContext selectStatementContext,
                                                 final Map<String, Integer> columnLabelIndexMap, final SchemaMetaData schemaMetaData) throws SQLException {
         return selectStatementContext.isSameGroupByAndOrderByItems()

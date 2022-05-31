@@ -34,18 +34,18 @@ import java.util.Collections;
 public abstract class AbstractSQLBuilder implements SQLBuilder {
     
     private final SQLRewriteContext context;
-    
+    // 对 Token 进行排序，然后通过拼接原始 SQL 和替换的 Token 以及连接符，最后形成完整的改写 SQL
     @Override
     public final String toSQL() {
         if (context.getSqlTokens().isEmpty()) {
             return context.getSql();
         }
-        Collections.sort(context.getSqlTokens());
+        Collections.sort(context.getSqlTokens()); // 按照Token的起始位置排序
         StringBuilder result = new StringBuilder();
-        result.append(context.getSql().substring(0, context.getSqlTokens().get(0).getStartIndex()));
+        result.append(context.getSql().substring(0, context.getSqlTokens().get(0).getStartIndex())); // 添加第一个Token之前的原始SQL
         for (SQLToken each : context.getSqlTokens()) {
-            result.append(getSQLTokenText(each));
-            result.append(getConjunctionText(each));
+            result.append(getSQLTokenText(each)); // 添加Token对应的SQL片段
+            result.append(getConjunctionText(each)); // 添加Token之间的连接字符
         }
         return result.toString();
     }

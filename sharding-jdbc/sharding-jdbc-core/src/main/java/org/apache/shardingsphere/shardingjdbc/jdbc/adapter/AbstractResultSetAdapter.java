@@ -36,7 +36,7 @@ import java.sql.Statement;
 import java.util.List;
 
 /**
- * Adapter for {@code ResultSet}.
+ * Adapter for {@code ResultSet}. 大部分方法实现，是通过第一个底层 ResultSet，调用其对应方法获得，这些属性的设置，也依次对各个底层 ResultSet 执行对应设置方法即可
  */
 public abstract class AbstractResultSetAdapter extends AbstractUnsupportedOperationResultSet {
     

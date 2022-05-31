@@ -48,7 +48,7 @@ public final class SQLParserFactory {
      */
     public static SQLParser newInstance(final String databaseTypeName, final String sql) {
         for (SQLParserConfiguration each : NewInstanceServiceLoader.newServiceInstances(SQLParserConfiguration.class)) {
-            if (each.getDatabaseTypeName().equals(databaseTypeName)) {
+            if (each.getDatabaseTypeName().equals(databaseTypeName)) { // 创建对应数据库类型的 SQL 解析器
                 return createSQLParser(sql, each);
             }
         }
@@ -56,7 +56,7 @@ public final class SQLParserFactory {
     }
     
     @SneakyThrows
-    private static SQLParser createSQLParser(final String sql, final SQLParserConfiguration configuration) {
+    private static SQLParser createSQLParser(final String sql, final SQLParserConfiguration configuration) { // 根据 SQLParserConfiguration 里配置，创建对应的词法与语法解析器
         Lexer lexer = (Lexer) configuration.getLexerClass().getConstructor(CharStream.class).newInstance(CharStreams.fromString(sql));
         return configuration.getParserClass().getConstructor(TokenStream.class).newInstance(new CommonTokenStream(lexer));
     }

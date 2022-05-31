@@ -44,7 +44,7 @@ public final class SQLExecutePrepareTemplate {
     
     /**
      * Get execute unit groups.
-     *
+     * 首先按照数据库进行分组，然后根据 SQL 单元的数量与 maxConnectionsSizePerQuery 计算得出采用连接限制类型还是内存限制类型，最后生成 SQL 执行单元的最后分组
      * @param executionUnits execution units
      * @param callback SQL execute prepare callback
      * @return statement execute unit groups
@@ -53,17 +53,17 @@ public final class SQLExecutePrepareTemplate {
     public Collection<InputGroup<StatementExecuteUnit>> getExecuteUnitGroups(final Collection<ExecutionUnit> executionUnits, final SQLExecutePrepareCallback callback) throws SQLException {
         return getSynchronizedExecuteUnitGroups(executionUnits, callback);
     }
-    
+    // 生成同步执行单元分组
     private Collection<InputGroup<StatementExecuteUnit>> getSynchronizedExecuteUnitGroups(
             final Collection<ExecutionUnit> executionUnits, final SQLExecutePrepareCallback callback) throws SQLException {
-        Map<String, List<SQLUnit>> sqlUnitGroups = getSQLUnitGroups(executionUnits);
+        Map<String, List<SQLUnit>> sqlUnitGroups = getSQLUnitGroups(executionUnits); // 按照数据库进行分组，生成数据源与其 SQLUnit 的对应映射
         Collection<InputGroup<StatementExecuteUnit>> result = new LinkedList<>();
         for (Entry<String, List<SQLUnit>> entry : sqlUnitGroups.entrySet()) {
-            result.addAll(getSQLExecuteGroups(entry.getKey(), entry.getValue(), callback));
+            result.addAll(getSQLExecuteGroups(entry.getKey(), entry.getValue(), callback)); // 将 SQLUnit 集合转化为 InputGroup<StatementExecuteUnit>，对应关系为1:1
         }
         return result;
     }
-    
+    // 按照数据库进行分组
     private Map<String, List<SQLUnit>> getSQLUnitGroups(final Collection<ExecutionUnit> executionUnits) {
         Map<String, List<SQLUnit>> result = new LinkedHashMap<>(executionUnits.size(), 1);
         for (ExecutionUnit each : executionUnits) {
@@ -74,21 +74,21 @@ public final class SQLExecutePrepareTemplate {
         }
         return result;
     }
-    
+    // 根据SQL单元的数量与maxConnectionsSizePerQuery计算得出采用连接限制类型还是内存限制类型
     private List<InputGroup<StatementExecuteUnit>> getSQLExecuteGroups(final String dataSourceName,
                                                                        final List<SQLUnit> sqlUnits, final SQLExecutePrepareCallback callback) throws SQLException {
         List<InputGroup<StatementExecuteUnit>> result = new LinkedList<>();
         int desiredPartitionSize = Math.max(0 == sqlUnits.size() % maxConnectionsSizePerQuery ? sqlUnits.size() / maxConnectionsSizePerQuery : sqlUnits.size() / maxConnectionsSizePerQuery + 1, 1);
         List<List<SQLUnit>> sqlUnitPartitions = Lists.partition(sqlUnits, desiredPartitionSize);
         ConnectionMode connectionMode = maxConnectionsSizePerQuery < sqlUnits.size() ? ConnectionMode.CONNECTION_STRICTLY : ConnectionMode.MEMORY_STRICTLY;
-        List<Connection> connections = callback.getConnections(connectionMode, dataSourceName, sqlUnitPartitions.size());
+        List<Connection> connections = callback.getConnections(connectionMode, dataSourceName, sqlUnitPartitions.size()); // 根据要执行的 SQL 数量和 maxConnectionsSizePerQuery 配置，计算
         int count = 0;
         for (List<SQLUnit> each : sqlUnitPartitions) {
-            result.add(getSQLExecuteGroup(connectionMode, connections.get(count++), dataSourceName, each, callback));
+            result.add(getSQLExecuteGroup(connectionMode, connections.get(count++), dataSourceName, each, callback)); // 根据要执行的SQLUnit，生成对应StatementExecuteUnit对象，添加到返回结果集中
         }
         return result;
     }
-    
+    // 生成SQL执行分组
     private InputGroup<StatementExecuteUnit> getSQLExecuteGroup(final ConnectionMode connectionMode, final Connection connection,
                                                                 final String dataSourceName, final List<SQLUnit> sqlUnitGroup, final SQLExecutePrepareCallback callback) throws SQLException {
         List<StatementExecuteUnit> result = new LinkedList<>();

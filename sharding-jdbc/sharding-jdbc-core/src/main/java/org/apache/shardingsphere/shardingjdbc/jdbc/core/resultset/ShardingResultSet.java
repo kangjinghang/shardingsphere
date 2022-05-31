@@ -41,7 +41,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 /**
- * Result that support sharding.
+ * Result that support sharding. 实现了 JDBC 的 ResultSet 接口，在应用拿到 ResultSet 时，调用其 next() 方法时，实际调用的是这些 MergedResult 实现类的 next() 方法
  */
 public final class ShardingResultSet extends AbstractResultSetAdapter {
     
@@ -62,7 +62,7 @@ public final class ShardingResultSet extends AbstractResultSetAdapter {
         }
         return result;
     }
-    
+    // 实际调用的是 MergedResult 实现类的 next() 方法
     @Override
     public boolean next() throws SQLException {
         return mergeResultSet.next();

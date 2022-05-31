@@ -30,7 +30,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
- * Data source metas.
+ * Data source metas. 数据源元数据
  */
 public final class DataSourceMetas {
     

@@ -113,7 +113,7 @@ public final class OrderByValue implements Comparable<OrderByValue> {
         }
         return result;
     }
-    
+    // 根据排序方向保证元素值的正确顺序
     @Override
     public int compareTo(final OrderByValue o) {
         int i = 0;

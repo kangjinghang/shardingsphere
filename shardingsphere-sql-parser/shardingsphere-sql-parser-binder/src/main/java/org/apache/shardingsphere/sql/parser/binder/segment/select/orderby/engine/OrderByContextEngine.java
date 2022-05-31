@@ -32,7 +32,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Order by context engine.
+ * Order by context engine. 排序上下文引擎类
  */
 public final class OrderByContextEngine {
     
@@ -45,11 +45,11 @@ public final class OrderByContextEngine {
      */
     public OrderByContext createOrderBy(final SelectStatement selectStatement, final GroupByContext groupByContext) {
         if (!selectStatement.getOrderBy().isPresent() || selectStatement.getOrderBy().get().getOrderByItems().isEmpty()) {
-            OrderByContext orderByItems = createOrderByContextForDistinctRowWithoutGroupBy(selectStatement, groupByContext);
-            return null != orderByItems ? orderByItems : new OrderByContext(groupByContext.getItems(), !groupByContext.getItems().isEmpty());
+            OrderByContext orderByItems = createOrderByContextForDistinctRowWithoutGroupBy(selectStatement, groupByContext); // 如果有distinct且没有group by，则需要添加order by从而实现流式查询进行优化
+            return null != orderByItems ? orderByItems : new OrderByContext(groupByContext.getItems(), !groupByContext.getItems().isEmpty()); // 如果有group by，生成group by列的对应的order by
         }
         List<OrderByItem> orderByItems = new LinkedList<>();
-        for (OrderByItemSegment each : selectStatement.getOrderBy().get().getOrderByItems()) {
+        for (OrderByItemSegment each : selectStatement.getOrderBy().get().getOrderByItems()) { // 如果SQL本身就有order by，则按照原顺序生成
             OrderByItem orderByItem = new OrderByItem(each);
             if (each instanceof IndexOrderByItemSegment) {
                 orderByItem.setIndex(((IndexOrderByItemSegment) each).getColumnIndex());
@@ -60,7 +60,7 @@ public final class OrderByContextEngine {
     }
 
     private OrderByContext createOrderByContextForDistinctRowWithoutGroupBy(final SelectStatement selectStatement, final GroupByContext groupByContext) {
-        if (groupByContext.getItems().isEmpty() && selectStatement.getProjections().isDistinctRow()) {
+        if (groupByContext.getItems().isEmpty() && selectStatement.getProjections().isDistinctRow()) { // 没有group by但有distinct，，则添加各查询列的order by
             int index = 0;
             List<OrderByItem> orderByItems = new LinkedList<>();
             for (ProjectionSegment projectionSegment : selectStatement.getProjections().getProjections()) {

@@ -63,7 +63,7 @@ public final class DataNodeRouter {
     }
     
     /**
-     * Route SQL.
+     * Route SQL. 完成了路由上下文RouteContext的生成
      *
      * @param sql SQL
      * @param parameters SQL parameters
@@ -73,7 +73,7 @@ public final class DataNodeRouter {
     public RouteContext route(final String sql, final List<Object> parameters, final boolean useCache) {
         routingHook.start(sql);
         try {
-            RouteContext result = executeRoute(sql, parameters, useCache);
+            RouteContext result = executeRoute(sql, parameters, useCache); // 进行路由计算，生成路由结果
             routingHook.finishSuccess(result, metaData.getSchema());
             return result;
             // CHECKSTYLE:OFF
@@ -86,17 +86,17 @@ public final class DataNodeRouter {
     
     @SuppressWarnings("unchecked")
     private RouteContext executeRoute(final String sql, final List<Object> parameters, final boolean useCache) {
-        RouteContext result = createRouteContext(sql, parameters, useCache);
+        RouteContext result = createRouteContext(sql, parameters, useCache); // 进行路由计算，生成路由结果
         for (Entry<BaseRule, RouteDecorator> entry : decorators.entrySet()) {
-            result = entry.getValue().decorate(result, metaData, entry.getKey(), properties);
+            result = entry.getValue().decorate(result, metaData, entry.getKey(), properties); // 依次调用注册的RouteDecorator实现类decorate方法，根据路由结果对RouteContext对象进行对应的操作（分库分表或者主从时真正的路由逻辑）
         }
         return result;
     }
-    
+    // 调用解析引擎完成了SQL的解析，创建了一个初始的RouteContext实例
     private RouteContext createRouteContext(final String sql, final List<Object> parameters, final boolean useCache) {
-        SQLStatement sqlStatement = parserEngine.parse(sql, useCache);
+        SQLStatement sqlStatement = parserEngine.parse(sql, useCache); // 解析 SQL，生成 SQL 对应 AST
         try {
-            SQLStatementContext sqlStatementContext = SQLStatementContextFactory.newInstance(metaData.getSchema(), sql, parameters, sqlStatement);
+            SQLStatementContext sqlStatementContext = SQLStatementContextFactory.newInstance(metaData.getSchema(), sql, parameters, sqlStatement); // 生成SQL Statement上下文，相当于一部分语义分析
             return new RouteContext(sqlStatementContext, parameters, new RouteResult());
             // TODO should pass parameters for master-slave
         } catch (final IndexOutOfBoundsException ex) {

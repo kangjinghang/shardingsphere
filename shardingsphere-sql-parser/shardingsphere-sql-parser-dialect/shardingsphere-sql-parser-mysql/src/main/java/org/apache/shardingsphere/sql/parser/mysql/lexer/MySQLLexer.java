@@ -22,9 +22,9 @@ import org.apache.shardingsphere.sql.parser.api.lexer.SQLLexer;
 import org.apache.shardingsphere.sql.parser.autogen.MySQLStatementLexer;
 
 /**
- * SQL lexer for MySQL.
+ * SQL lexer for MySQL. MySQL使用的词法解析器
  */
-public final class MySQLLexer extends MySQLStatementLexer implements SQLLexer {
+public final class MySQLLexer extends MySQLStatementLexer implements SQLLexer { // MySQLStatementLexer是antlr根据.g4文件生成的MySQL词法解析器
     
     public MySQLLexer(final CharStream input) {
         super(input);

@@ -29,7 +29,7 @@ import java.util.Map;
 import java.util.Properties;
 
 /**
- * Sharding data source factory.
+ * Sharding data source factory. 分库分表 DataSource 工厂类
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ShardingDataSourceFactory {

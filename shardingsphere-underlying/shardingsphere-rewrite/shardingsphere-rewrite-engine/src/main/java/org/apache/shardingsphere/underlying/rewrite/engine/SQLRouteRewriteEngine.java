@@ -38,7 +38,7 @@ import java.util.Map;
 public final class SQLRouteRewriteEngine {
     
     /**
-     * Rewrite SQL and parameters.
+     * Rewrite SQL and parameters. 与 SQLRewriteEngine 类相似，只不过改为遍历路由结果中包含的 RouteUnit，然后分别创建对应的 SQLRewriteResult 实例，这里构建改写SQL的类用了一个 RouteSQLBuilder 类
      *
      * @param sqlRewriteContext SQL rewrite context
      * @param routeResult route result

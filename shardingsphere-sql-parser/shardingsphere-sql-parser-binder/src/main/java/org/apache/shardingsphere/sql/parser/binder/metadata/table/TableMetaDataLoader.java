@@ -27,7 +27,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 /**
- * Table meta data loader.
+ * Table meta data loader. 核心逻辑都是通过获取数据库连接Connection实例，然后通过其getMetaData()获得DatabaseMetaData实例，然后调用getSchemas、getTables、getColums等方法拿到对应的表与列信息
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class TableMetaDataLoader {

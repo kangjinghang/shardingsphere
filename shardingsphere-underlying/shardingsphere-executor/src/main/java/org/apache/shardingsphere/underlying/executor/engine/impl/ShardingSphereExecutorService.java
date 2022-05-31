@@ -27,7 +27,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
 /**
- * ShardingSphere executor service.
+ * ShardingSphere executor service. 自定义的线程池
  */
 @Getter
 public final class ShardingSphereExecutorService {
@@ -35,13 +35,13 @@ public final class ShardingSphereExecutorService {
     private static final String DEFAULT_NAME_FORMAT = "%d";
     
     private static final ExecutorService SHUTDOWN_EXECUTOR = Executors.newSingleThreadExecutor(ShardingSphereThreadFactoryBuilder.build("Executor-Engine-Closer"));
-    
+    // google guava 工具包中的可监听 ExecutorService
     private ListeningExecutorService executorService;
     
     public ShardingSphereExecutorService(final int executorSize) {
         this(executorSize, DEFAULT_NAME_FORMAT);
     }
-    
+
     public ShardingSphereExecutorService(final int executorSize, final String nameFormat) {
         executorService = MoreExecutors.listeningDecorator(getExecutorService(executorSize, nameFormat));
         MoreExecutors.addDelayedShutdownHook(executorService, 60, TimeUnit.SECONDS);

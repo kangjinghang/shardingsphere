@@ -185,8 +185,8 @@ public abstract class AbstractStatementAdapter extends AbstractUnsupportedOperat
         recordMethodInvocation(targetClass, "setQueryTimeout", new Class[] {int.class}, new Object[] {seconds});
         forceExecuteTemplate.execute((Collection) getRoutedStatements(), statement -> statement.setQueryTimeout(seconds));
     }
-    
+    // 判断是否需要进行累计，在 getUpdateCount() 方法中，会首先判断 isAccumulate() 的值，如果是true，则需要将 getRoutedStatements() 返回的各 Statement 的 getUpdateCount() 值进行累计
     protected abstract boolean isAccumulate();
-    
+    // 返回路由后对应的真正底层的 Statement 实现类，不同功能中该方法实现不同
     protected abstract Collection<? extends Statement> getRoutedStatements();
 }

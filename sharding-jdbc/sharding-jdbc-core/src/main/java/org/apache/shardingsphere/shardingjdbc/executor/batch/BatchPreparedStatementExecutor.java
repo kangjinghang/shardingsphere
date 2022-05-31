@@ -64,7 +64,7 @@ public final class BatchPreparedStatementExecutor extends AbstractStatementExecu
     }
     
     /**
-     * Initialize executor.
+     * Initialize executor. 生成了执行分组信息
      *
      * @param sqlStatementContext SQL statement context
      * @throws SQLException SQL exception
@@ -97,7 +97,7 @@ public final class BatchPreparedStatementExecutor extends AbstractStatementExecu
     }
     
     /**
-     * Add batch for route units.
+     * Add batch for route units. handleOldBatchRouteUnits 和 handleNewBatchRouteUnits 这两个方法其实就是按照路由单元进行合并批量执行的参数
      *
      * @param executionContext execution context
      */
@@ -139,7 +139,7 @@ public final class BatchPreparedStatementExecutor extends AbstractStatementExecu
     }
     
     /**
-     * Execute batch.
+     * Execute batch. 通过父类中 executeCallback 方法按照分组，依次调用底层 PreparedStatement 的 executeBatch 进行 SQL 的执行
      * 
      * @return execute results
      * @throws SQLException SQL exception

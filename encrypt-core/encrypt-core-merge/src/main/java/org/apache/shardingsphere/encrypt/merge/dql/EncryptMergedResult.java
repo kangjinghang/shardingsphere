@@ -42,7 +42,7 @@ public final class EncryptMergedResult implements MergedResult {
     public boolean next() throws SQLException {
         return mergedResult.next();
     }
-    
+    // 先判断是否需要进行解密，如果需要则查询对应的加密器对象，然后执行解密，然后返回
     @Override
     public Object getValue(final int columnIndex, final Class<?> type) throws SQLException {
         if (!queryWithCipherColumn) {

@@ -26,10 +26,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 /**
- * Adapter for {@code java.sql.Wrapper}.
+ * Adapter for {@code java.sql.Wrapper}. 实现了Wrapper接口，是ShardingSphere各JDBC实现类的基础基类，无论是DataSource、Connection、Statement、PrepareStatement都具备了该回放能力。
  */
 public abstract class WrapperAdapter implements Wrapper {
-    
+    // 记录了当前 JDBC 资源的一些方法操作
     private final Collection<JdbcMethodInvocation> jdbcMethodInvocations = new ArrayList<>();
     
     @SuppressWarnings("unchecked")
@@ -47,7 +47,7 @@ public abstract class WrapperAdapter implements Wrapper {
     }
     
     /**
-     * record method invocation.
+     * record method invocation. 负责记录外围应用的一些设置方法的调用，例如 setAutoCommit、setReadOnly、setFetchSize、setMaxFieldSize 等
      * 
      * @param targetClass target class
      * @param methodName method name
@@ -60,7 +60,7 @@ public abstract class WrapperAdapter implements Wrapper {
     }
     
     /**
-     * Replay methods invocation.
+     * Replay methods invocation. 在外围程序调用 ShardingConnection 的 setAutoCommit、setReadOnly 以及 ShardingPreparedStatement 的 setFetchSize、setMaxFieldSize 时进行调用， 此方法在完成指定目标对象回放这些方法调用，会在底层真实 JDBC类（DB driver、数据库连接池等）时进行重新调用
      * 
      * @param target target object
      */

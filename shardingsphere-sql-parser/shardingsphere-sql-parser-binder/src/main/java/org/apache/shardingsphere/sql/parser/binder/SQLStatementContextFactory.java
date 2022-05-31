@@ -73,7 +73,7 @@ import java.util.List;
 public final class SQLStatementContextFactory {
     
     /**
-     * Create SQL statement context.
+     * Create SQL statement context. 根据不同的SQL类型，将 SQLStatement 创建对应的 SQLStatementContext 对象
      *
      * @param schemaMetaData table meta data
      * @param sql SQL

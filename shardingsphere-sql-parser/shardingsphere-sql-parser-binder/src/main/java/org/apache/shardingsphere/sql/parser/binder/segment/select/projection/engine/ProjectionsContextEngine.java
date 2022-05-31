@@ -41,7 +41,7 @@ import java.util.LinkedList;
 import java.util.Optional;
 
 /**
- * Projections context engine.
+ * Projections context engine. 查询列上下文引擎类
  */
 public final class ProjectionsContextEngine {
     
@@ -67,8 +67,8 @@ public final class ProjectionsContextEngine {
         ProjectionsSegment projectionsSegment = selectStatement.getProjections();
         Collection<Projection> projections = getProjections(sql, selectStatement.getSimpleTableSegments(), projectionsSegment);
         ProjectionsContext result = new ProjectionsContext(projectionsSegment.getStartIndex(), projectionsSegment.getStopIndex(), projectionsSegment.isDistinctRow(), projections);
-        result.getProjections().addAll(getDerivedGroupByColumns(projections, groupByContext, selectStatement));
-        result.getProjections().addAll(getDerivedOrderByColumns(projections, orderByContext, selectStatement));
+        result.getProjections().addAll(getDerivedGroupByColumns(projections, groupByContext, selectStatement)); // 添加group by 对应的衍生 projection
+        result.getProjections().addAll(getDerivedOrderByColumns(projections, orderByContext, selectStatement)); // 添加order by 对应的衍生 projection
         return result;
     }
     

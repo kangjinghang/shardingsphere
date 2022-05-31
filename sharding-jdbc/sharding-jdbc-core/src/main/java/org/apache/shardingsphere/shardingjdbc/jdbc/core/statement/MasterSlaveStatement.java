@@ -41,7 +41,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 
 /**
- * Statement that support master-slave.
+ * Statement that support master-slave. 主从功能
  */
 @Getter
 public final class MasterSlaveStatement extends AbstractStatementAdapter {
@@ -85,14 +85,14 @@ public final class MasterSlaveStatement extends AbstractStatementAdapter {
         MasterSlaveRuntimeContext runtimeContext = connection.getRuntimeContext();
         SimpleQueryPrepareEngine prepareEngine = new SimpleQueryPrepareEngine(
                 Collections.singletonList(runtimeContext.getRule()), runtimeContext.getProperties(), runtimeContext.getMetaData(), runtimeContext.getSqlParserEngine());
-        ExecutionContext executionContext = prepareEngine.prepare(sql, Collections.emptyList());
+        ExecutionContext executionContext = prepareEngine.prepare(sql, Collections.emptyList()); // 通过 SimpleQueryPrepareEngine 进行 prepare 操作
         ExecutionUnit executionUnit = executionContext.getExecutionUnits().iterator().next();
         Preconditions.checkState(1 == executionContext.getExecutionUnits().size(), "Cannot support executeQuery for DML or DDL");
-        Statement statement = connection.getConnection(executionUnit.getDataSourceName()).createStatement(resultSetType, resultSetConcurrency, resultSetHoldability);
+        Statement statement = connection.getConnection(executionUnit.getDataSourceName()).createStatement(resultSetType, resultSetConcurrency, resultSetHoldability); // 与ShardingStatement中通过StatementExecutor创建Statement，执行SQL不同，这里是直接调用MasterSlaveConnection
         routedStatements.add(statement);
         return statement.executeQuery(executionUnit.getSqlUnit().getSql());
     }
-    
+    // 不像ShardingStatement中统一都使用SimpleQueryPrepareEngine进行prepare操作，而是，直接就操作了dataNodeRouter.route方法
     @Override
     public int executeUpdate(final String sql) throws SQLException {
         clearPrevious();

@@ -26,7 +26,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
- * Sharding database meta data.
+ * Sharding database meta data. 主要实现的getActualTable 、getActualTableNamePattern方法中就是根据ShardingRule查找到真实的表名、表名pattern以及创建DatabaseMetaDataResultSet实例
  */
 public final class ShardingDatabaseMetaData extends MultipleDatabaseMetaData<ShardingConnection> {
     

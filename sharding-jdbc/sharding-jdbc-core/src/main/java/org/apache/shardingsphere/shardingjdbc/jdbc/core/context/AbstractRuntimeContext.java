@@ -48,7 +48,7 @@ public abstract class AbstractRuntimeContext<T extends BaseRule> implements Runt
     private final ExecutorEngine executorEngine;
     
     private final SQLParserEngine sqlParserEngine;
-    
+    // 对执行引擎、解析引擎等属性进行赋值与初始化
     protected AbstractRuntimeContext(final T rule, final Properties props, final DatabaseType databaseType) {
         this.rule = rule;
         properties = new ConfigurationProperties(null == props ? new Properties() : props);
@@ -58,7 +58,7 @@ public abstract class AbstractRuntimeContext<T extends BaseRule> implements Runt
         ConfigurationLogger.log(rule.getRuleConfiguration());
         ConfigurationLogger.log(props);
     }
-    
+    // 各功能实现的 RuntimeContex 实现类的主要逻辑都为围绕如何生成 ShardingSphereMetaData 对象
     protected abstract ShardingSphereMetaData getMetaData();
     
     @Override

@@ -24,9 +24,9 @@ import org.apache.shardingsphere.sql.parser.autogen.MySQLStatementParser;
 import org.apache.shardingsphere.sql.parser.core.ParseASTNode;
 
 /**
- * SQL parser for MySQL.
+ * SQL parser for MySQL. MySQL使用的语法解析器
  */
-public final class MySQLParser extends MySQLStatementParser implements SQLParser {
+public final class MySQLParser extends MySQLStatementParser implements SQLParser { // MySQLStatementParser是antlr根据.g4文件生成的语法解析器
     
     public MySQLParser(final TokenStream input) {
         super(input);
@@ -34,6 +34,6 @@ public final class MySQLParser extends MySQLStatementParser implements SQLParser
     
     @Override
     public ASTNode parse() {
-        return new ParseASTNode(execute());
+        return new ParseASTNode(execute()); // 根据 antlr 返回的 ExecuteContext 创建 ParseASTNode 对象
     }
 }

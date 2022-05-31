@@ -49,14 +49,14 @@ import org.apache.shardingsphere.underlying.common.metadata.ShardingSphereMetaDa
 import java.util.Collection;
 
 /**
- * Sharding routing engine factory.
+ * Sharding routing engine factory. ShardingRouteEngine的工厂类
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ShardingRouteEngineFactory {
     
     /**
-     * Create new instance of routing engine.
-     * 
+     * Create new instance of routing engine. 根据SQL类型创建不同ShardingRouteEngine，因为不同的类型的SQL对应着的不同的路由策略，例如全库路由、全库表路由、单库路由、标准路由等
+     *
      * @param shardingRule sharding rule
      * @param metaData meta data of ShardingSphere
      * @param sqlStatementContext SQL statement context
@@ -69,47 +69,47 @@ public final class ShardingRouteEngineFactory {
                                                   final ShardingConditions shardingConditions, final ConfigurationProperties properties) {
         SQLStatement sqlStatement = sqlStatementContext.getSqlStatement();
         Collection<String> tableNames = sqlStatementContext.getTablesContext().getTableNames();
-        if (sqlStatement instanceof TCLStatement) {
+        if (sqlStatement instanceof TCLStatement) { // 事务控制类SQL(commit、rollback、savepoint、set transaction)，库广播类路由
             return new ShardingDatabaseBroadcastRoutingEngine();
         }
-        if (sqlStatement instanceof DDLStatement) {
+        if (sqlStatement instanceof DDLStatement) { // DDL SQL（create、alter、drop、truncate...），表广播类路由
             return new ShardingTableBroadcastRoutingEngine(metaData.getSchema(), sqlStatementContext);
         }
-        if (sqlStatement instanceof DALStatement) {
+        if (sqlStatement instanceof DALStatement) { // DAL SQL (show database、show tables... )，根据SQL类型选择库广播、表路由或者默认库路由
             return getDALRoutingEngine(shardingRule, sqlStatement, tableNames);
         }
-        if (sqlStatement instanceof DCLStatement) {
+        if (sqlStatement instanceof DCLStatement) { // DCL 采用表广播路由或者主库路由
             return getDCLRoutingEngine(sqlStatementContext, metaData);
         }
-        if (shardingRule.isAllInDefaultDataSource(tableNames)) {
+        if (shardingRule.isAllInDefaultDataSource(tableNames)) { // 如果都是表名都配置默认数据源，则采用默认库路由
             return new ShardingDefaultDatabaseRoutingEngine(tableNames);
         }
-        if (shardingRule.isAllBroadcastTables(tableNames)) {
+        if (shardingRule.isAllBroadcastTables(tableNames)) { // 如果都属于配置中的广播表，查询采用单一路由，随机选择配置的数据源
             return sqlStatement instanceof SelectStatement ? new ShardingUnicastRoutingEngine(tableNames) : new ShardingDatabaseBroadcastRoutingEngine();
         }
-        if (sqlStatementContext.getSqlStatement() instanceof DMLStatement && tableNames.isEmpty() && shardingRule.hasDefaultDataSourceName()) {
+        if (sqlStatementContext.getSqlStatement() instanceof DMLStatement && tableNames.isEmpty() && shardingRule.hasDefaultDataSourceName()) { // DML SQL 如果表名为空而且配置了默认库，则采用默认库路由
             return new ShardingDefaultDatabaseRoutingEngine(tableNames);
         }
-        if (sqlStatementContext.getSqlStatement() instanceof DMLStatement && shardingConditions.isAlwaysFalse() || tableNames.isEmpty() || !shardingRule.tableRuleExists(tableNames)) {
+        if (sqlStatementContext.getSqlStatement() instanceof DMLStatement && shardingConditions.isAlwaysFalse() || tableNames.isEmpty() || !shardingRule.tableRuleExists(tableNames)) { // DML SQL如果表名为空或者未配置sharding规则，则采用单一路由，随机选择数据源
             return new ShardingUnicastRoutingEngine(tableNames);
         }
-        return getShardingRoutingEngine(shardingRule, sqlStatementContext, shardingConditions, tableNames, properties);
+        return getShardingRoutingEngine(shardingRule, sqlStatementContext, shardingConditions, tableNames, properties); // 其它采用标准路由或者复杂路由
     }
     
     private static ShardingRouteEngine getDALRoutingEngine(final ShardingRule shardingRule, final SQLStatement sqlStatement, final Collection<String> tableNames) {
-        if (sqlStatement instanceof UseStatement) {
+        if (sqlStatement instanceof UseStatement) { // Use SQL忽略类路由
             return new ShardingIgnoreRoutingEngine();
         }
-        if (sqlStatement instanceof SetStatement || sqlStatement instanceof ResetParameterStatement || sqlStatement instanceof ShowDatabasesStatement) {
+        if (sqlStatement instanceof SetStatement || sqlStatement instanceof ResetParameterStatement || sqlStatement instanceof ShowDatabasesStatement) { // set、reset、show database 库广播类路由
             return new ShardingDatabaseBroadcastRoutingEngine();
         }
-        if (!tableNames.isEmpty() && !shardingRule.tableRuleExists(tableNames) && shardingRule.hasDefaultDataSourceName()) {
+        if (!tableNames.isEmpty() && !shardingRule.tableRuleExists(tableNames) && shardingRule.hasDefaultDataSourceName()) { // 如果表名在sharding规则中未配置的使用默认库路由
             return new ShardingDefaultDatabaseRoutingEngine(tableNames);
         }
-        if (!tableNames.isEmpty()) {
+        if (!tableNames.isEmpty()) { // 如果表名不为空，采用单一路由
             return new ShardingUnicastRoutingEngine(tableNames);
         }
-        return new ShardingDataSourceGroupBroadcastRoutingEngine();
+        return new ShardingDataSourceGroupBroadcastRoutingEngine(); // 采用数据库群组路由
     }
     
     private static ShardingRouteEngine getDCLRoutingEngine(final SQLStatementContext sqlStatementContext, final ShardingSphereMetaData metaData) {
@@ -128,7 +128,7 @@ public final class ShardingRouteEngineFactory {
     private static ShardingRouteEngine getShardingRoutingEngine(final ShardingRule shardingRule, final SQLStatementContext sqlStatementContext,
                                                                 final ShardingConditions shardingConditions, final Collection<String> tableNames, final ConfigurationProperties properties) {
         Collection<String> shardingTableNames = shardingRule.getShardingLogicTableNames(tableNames);
-        if (1 == shardingTableNames.size() || shardingRule.isAllBindingTables(shardingTableNames)) {
+        if (1 == shardingTableNames.size() || shardingRule.isAllBindingTables(shardingTableNames)) { // 只有一张逻辑表或者都是绑定表，采用标准路由
             return new ShardingStandardRoutingEngine(shardingTableNames.iterator().next(), sqlStatementContext, shardingConditions, properties);
         }
         // TODO config for cartesian set

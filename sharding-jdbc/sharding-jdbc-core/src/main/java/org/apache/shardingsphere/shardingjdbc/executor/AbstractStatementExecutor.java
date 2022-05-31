@@ -62,33 +62,33 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 /**
- * Abstract statement executor.
+ * Abstract statement executor. 各类StatementExecutor的抽象类，它包含了Statement执行的各种信息，包括resultSetType、resultSetConcurrency、resultSetHoldability，另外也持有ShardingSphere的Connection实例、路由后的真实Statement列表，参数集合、执行后的结果集、执行分组信息、以及执行准备引擎、执行引擎
  */
 @Getter
 public abstract class AbstractStatementExecutor {
     
     private final DatabaseType databaseType;
-    
+    // Statement 执行的各种信息
     private final int resultSetType;
-    
+    // Statement 执行的各种信息
     private final int resultSetConcurrency;
-    
+    // Statement 执行的各种信息
     private final int resultSetHoldability;
-    
+    // ShardingSphere 的 Connection 实例
     private final ShardingConnection connection;
-    
+    // 执行准备引擎
     private final SQLExecutePrepareTemplate sqlExecutePrepareTemplate;
-    
+    // 执行引擎
     private final SQLExecuteTemplate sqlExecuteTemplate;
     
     private final Collection<Connection> connections = new LinkedList<>();
-    
+    // 路由后的【真实】参数集合
     private final List<List<Object>> parameterSets = new LinkedList<>();
-    
+    // 路由后的【真实】 Statement 列表
     private final List<Statement> statements = new LinkedList<>();
-    
+    // 路由后的【真实】执行后的结果集
     private final List<ResultSet> resultSets = new CopyOnWriteArrayList<>();
-    
+    // 执行分组信息
     private final Collection<InputGroup<StatementExecuteUnit>> inputGroups = new LinkedList<>();
     
     @Setter
@@ -116,7 +116,7 @@ public abstract class AbstractStatementExecutor {
     /**
      * To make sure SkyWalking will be available at the next release of ShardingSphere,
      * a new plugin should be provided to SkyWalking project if this API changed.
-     * 
+     * 通过 SQLExecuteTemplate 来真正完成SQL的执行
      * @see <a href="https://github.com/apache/skywalking/blob/master/docs/en/guides/Java-Plugin-Development-Guide.md#user-content-plugin-development-guide">Plugin Development Guide</a>
      * 
      * @param executeCallback execute callback
@@ -126,8 +126,8 @@ public abstract class AbstractStatementExecutor {
      */
     @SuppressWarnings("unchecked")
     protected final <T> List<T> executeCallback(final SQLExecuteCallback<T> executeCallback) throws SQLException {
-        List<T> result = sqlExecuteTemplate.execute((Collection) inputGroups, executeCallback);
-        refreshMetaDataIfNeeded(connection.getRuntimeContext(), sqlStatementContext);
+        List<T> result = sqlExecuteTemplate.execute((Collection) inputGroups, executeCallback); // 通过 sqlExecuteTemplate 对输入的分组对象，执行指定的回调操作
+        refreshMetaDataIfNeeded(connection.getRuntimeContext(), sqlStatementContext); // 刷新元数据， 因为DDL会修改元数据信息
         return result;
     }
     
@@ -159,7 +159,7 @@ public abstract class AbstractStatementExecutor {
             each.close();
         }
     }
-    
+    // 刷新元数据， 因为 DDL 会修改元数据信息，表名、列名、字段类型、主键以及索引等信息可能发生了变化
     private void refreshMetaDataIfNeeded(final ShardingRuntimeContext runtimeContext, final SQLStatementContext sqlStatementContext) throws SQLException {
         if (null == sqlStatementContext) {
             return;

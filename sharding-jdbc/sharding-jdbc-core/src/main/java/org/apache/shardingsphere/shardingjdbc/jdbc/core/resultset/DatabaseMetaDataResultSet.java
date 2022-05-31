@@ -62,7 +62,7 @@ public final class DatabaseMetaDataResultSet<T extends BaseRule> extends Abstrac
     private volatile boolean closed;
     
     private DatabaseMetaDataObject currentDatabaseMetaDataObject;
-    
+    // 构造函数都会传入一个底层ResultSet或者迭代器Iterator
     public DatabaseMetaDataResultSet(final ResultSet resultSet, final T rule) throws SQLException {
         this.type = resultSet.getType();
         this.concurrency = resultSet.getConcurrency();
@@ -112,7 +112,7 @@ public final class DatabaseMetaDataResultSet<T extends BaseRule> extends Abstrac
         }
         return result;
     }
-    
+    // next()方法其实就是通过调用内部ResultSet或者Iterator的nex()完成游标的迁移
     @Override
     public boolean next() throws SQLException {
         checkClosed();
@@ -134,7 +134,7 @@ public final class DatabaseMetaDataResultSet<T extends BaseRule> extends Abstrac
         checkClosed();
         return false;
     }
-    
+    // get*方法则直接调用 ResultSet或者Iterator中的值的get*方法
     @Override
     public String getString(final int columnIndex) throws SQLException {
         checkClosed();

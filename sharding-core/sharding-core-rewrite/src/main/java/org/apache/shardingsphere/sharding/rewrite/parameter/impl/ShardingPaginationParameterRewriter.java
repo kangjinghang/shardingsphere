@@ -30,7 +30,7 @@ import org.apache.shardingsphere.underlying.route.context.RouteContext;
 import java.util.List;
 
 /**
- * Sharding pagination parameter rewriter.
+ * Sharding pagination parameter rewriter. 分页参数重写
  */
 @Setter
 public final class ShardingPaginationParameterRewriter implements ParameterRewriter<SelectStatementContext>, RouteContextAware {

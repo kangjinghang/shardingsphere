@@ -32,7 +32,7 @@ import java.util.Optional;
 import java.util.Random;
 
 /**
- * Multiple database meta data.
+ * Multiple database meta data. 对AdaptedDatabaseMetaData类中大多数方法进行了重写，通过调用子类实现的createDatabaseMetaDataResultSet方法获得真实的DatabaseMetaDataResultSet，同时通过子类实现getActualTableNamePattern、getActualTable方法获取到真实物理表名信息。
  */
 @Getter
 public abstract class MultipleDatabaseMetaData<C extends AbstractConnectionAdapter> extends AdaptedDatabaseMetaData {

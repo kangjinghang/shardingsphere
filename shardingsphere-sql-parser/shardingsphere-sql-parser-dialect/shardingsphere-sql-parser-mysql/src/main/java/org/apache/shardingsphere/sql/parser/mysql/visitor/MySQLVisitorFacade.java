@@ -32,7 +32,7 @@ import org.apache.shardingsphere.sql.parser.mysql.visitor.impl.MySQLRLVisitor;
 import org.apache.shardingsphere.sql.parser.mysql.visitor.impl.MySQLTCLVisitor;
 
 /**
- * Visitor facade for MySQL.
+ * Visitor facade for MySQL. 提供了 DML、DDL、DAL、DCL、RL 对应的访问器Class信息
  */
 public final class MySQLVisitorFacade implements SQLVisitorFacade {
     

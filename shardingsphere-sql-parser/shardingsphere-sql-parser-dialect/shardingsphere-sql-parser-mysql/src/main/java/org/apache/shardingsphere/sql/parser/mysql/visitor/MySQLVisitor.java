@@ -116,7 +116,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * MySQL visitor.
+ * MySQL visitor. 将 DML、DDL、DAL 等通用的一些解析操作，例如各类型的值、表名、列名等。
  */
 @Getter(AccessLevel.PROTECTED)
 public abstract class MySQLVisitor extends MySQLStatementBaseVisitor<ASTNode> {
@@ -210,7 +210,7 @@ public abstract class MySQLVisitor extends MySQLStatementBaseVisitor<ASTNode> {
     }
     
     @Override
-    public final ASTNode visitTableName(final TableNameContext ctx) {
+    public final ASTNode visitTableName(final TableNameContext ctx) { // 通过访问 TableNameContext 构建 TableSegment
         SimpleTableSegment result = new SimpleTableSegment(new TableNameSegment(ctx.getStart().getStartIndex(), ctx.getStop().getStopIndex(), (IdentifierValue) visit(ctx.name())));
         OwnerContext owner = ctx.owner();
         if (null != owner) {
@@ -220,7 +220,7 @@ public abstract class MySQLVisitor extends MySQLStatementBaseVisitor<ASTNode> {
     }
     
     @Override
-    public final ASTNode visitColumnName(final ColumnNameContext ctx) {
+    public final ASTNode visitColumnName(final ColumnNameContext ctx) { // 通过访问 ColumnNameContext 构建
         ColumnSegment result = new ColumnSegment(ctx.getStart().getStartIndex(), ctx.getStop().getStopIndex(), (IdentifierValue) visit(ctx.name()));
         OwnerContext owner = ctx.owner();
         if (null != owner) {

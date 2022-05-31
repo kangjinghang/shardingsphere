@@ -30,7 +30,7 @@ import org.apache.shardingsphere.sql.parser.sql.statement.SQLStatement;
 import java.util.Optional;
 
 /**
- * SQL parser engine.
+ * SQL parser engine. SQL 解析引擎
  */
 @RequiredArgsConstructor
 public final class SQLParserEngine {
@@ -55,10 +55,10 @@ public final class SQLParserEngine {
      * @return SQL statement
      */
     public SQLStatement parse(final String sql, final boolean useCache) {
-        ParsingHook parsingHook = new SPIParsingHook();
+        ParsingHook parsingHook = new SPIParsingHook(); // SQL 解析 hook
         parsingHook.start(sql);
         try {
-            SQLStatement result = parse0(sql, useCache);
+            SQLStatement result = parse0(sql, useCache); // 解析 SQL
             parsingHook.finishSuccess(result);
             return result;
             // CHECKSTYLE:OFF
@@ -72,12 +72,12 @@ public final class SQLParserEngine {
     private SQLStatement parse0(final String sql, final boolean useCache) {
         if (useCache) {
             Optional<SQLStatement> cachedSQLStatement = cache.getSQLStatement(sql);
-            if (cachedSQLStatement.isPresent()) {
+            if (cachedSQLStatement.isPresent()) { // 如果缓存中有该 SQL 的解析结果，则直接复用
                 return cachedSQLStatement.get();
             }
         }
-        ParseTree parseTree = new SQLParserExecutor(databaseTypeName, sql).execute().getRootNode();
-        SQLStatement result = (SQLStatement) ParseTreeVisitorFactory.newInstance(databaseTypeName, VisitorRule.valueOf(parseTree.getClass())).visit(parseTree);
+        ParseTree parseTree = new SQLParserExecutor(databaseTypeName, sql).execute().getRootNode(); // 1. 解析SQL生成AST，ParseTree 是 antlr 对应的解析树接口
+        SQLStatement result = (SQLStatement) ParseTreeVisitorFactory.newInstance(databaseTypeName, VisitorRule.valueOf(parseTree.getClass())).visit(parseTree); // 2. 通过访问者模式，将 antlr 的解析树转化为 SQLStatement
         if (useCache) {
             cache.put(sql, result);
         }

@@ -23,7 +23,7 @@ import org.apache.shardingsphere.underlying.rewrite.sql.token.pojo.SQLToken;
 import org.apache.shardingsphere.underlying.route.context.RouteUnit;
 
 /**
- * SQL builder with route.
+ * SQL builder with route. 与 DefaultSQLBuilder 类似，也继承自 AbstractSQLBuilder 类，只不过 getSQLTokenText 方法会判断是否是 RouteUnitAware 类型的 Token，如果是则调用 RouteUnit 参数的 toSQL 方法生成 SQL
  */
 public final class RouteSQLBuilder extends AbstractSQLBuilder {
     
@@ -33,7 +33,7 @@ public final class RouteSQLBuilder extends AbstractSQLBuilder {
         super(context);
         this.routeUnit = routeUnit;
     }
-    
+    // 判断是否是 RouteUnitAware 类型的 Token，如果是则调用 RouteUnit 参数的 toSQL 方法生成 SQL
     @Override
     protected String getSQLTokenText(final SQLToken sqlToken) {
         if (sqlToken instanceof RouteUnitAware) {

@@ -43,12 +43,12 @@ public final class ParseTreeVisitorFactory {
     public static ParseTreeVisitor newInstance(final String databaseTypeName, final VisitorRule visitorRule) {
         for (SQLParserConfiguration each : NewInstanceServiceLoader.newServiceInstances(SQLParserConfiguration.class)) {
             if (each.getDatabaseTypeName().equals(databaseTypeName)) {
-                return createParseTreeVisitor(each, visitorRule.getType());
+                return createParseTreeVisitor(each, visitorRule.getType()); // 创建解析树 antlr ParseTree 访问器
             }
         }
         throw new UnsupportedOperationException(String.format("Cannot support database type '%s'", databaseTypeName));
     }
-    
+    // 根据 SQL 的种类，然后调用 SQLVisitorFacade 方法得到获取到对应的 ParseTreeVisitor 实例
     @SneakyThrows
     private static ParseTreeVisitor createParseTreeVisitor(final SQLParserConfiguration configuration, final SQLStatementType type) {
         SQLVisitorFacade visitorFacade = configuration.getVisitorFacadeClass().getConstructor().newInstance();

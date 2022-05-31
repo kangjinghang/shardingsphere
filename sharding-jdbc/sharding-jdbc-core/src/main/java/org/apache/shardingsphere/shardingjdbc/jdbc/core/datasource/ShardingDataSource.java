@@ -41,11 +41,11 @@ import java.util.Properties;
 public class ShardingDataSource extends AbstractDataSourceAdapter {
     
     private final ShardingRuntimeContext runtimeContext;
-    
+    // 在 static 代码中注册了该功能需要的路由装饰器、SQL重写上下文装饰器以及结果处理引擎，该类实现了 getConnection() 方法
     static {
-        NewInstanceServiceLoader.register(RouteDecorator.class);
-        NewInstanceServiceLoader.register(SQLRewriteContextDecorator.class);
-        NewInstanceServiceLoader.register(ResultProcessEngine.class);
+        NewInstanceServiceLoader.register(RouteDecorator.class); // 注册路由装饰器
+        NewInstanceServiceLoader.register(SQLRewriteContextDecorator.class); // 注册 SQL 重写上下文装饰器
+        NewInstanceServiceLoader.register(ResultProcessEngine.class); // 注册结果处理引擎
     }
     
     public ShardingDataSource(final Map<String, DataSource> dataSourceMap, final ShardingRule shardingRule, final Properties props) throws SQLException {
@@ -59,7 +59,7 @@ public class ShardingDataSource extends AbstractDataSourceAdapter {
             Preconditions.checkArgument(!(each instanceof MasterSlaveDataSource), "Initialized data sources can not be master-slave data sources.");
         }
     }
-    
+    // 实现了getConnection()方法，返回 ShardingConnection 对象实例
     @Override
     public final ShardingConnection getConnection() {
         return new ShardingConnection(getDataSourceMap(), runtimeContext, TransactionTypeHolder.get());

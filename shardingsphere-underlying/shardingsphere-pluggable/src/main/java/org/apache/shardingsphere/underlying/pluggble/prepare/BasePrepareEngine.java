@@ -80,9 +80,9 @@ public abstract class BasePrepareEngine {
      */
     public ExecutionContext prepare(final String sql, final List<Object> parameters) {
         List<Object> clonedParameters = cloneParameters(parameters);
-        RouteContext routeContext = executeRoute(sql, clonedParameters);
+        RouteContext routeContext = executeRoute(sql, clonedParameters); // SQL路由
         ExecutionContext result = new ExecutionContext(routeContext.getSqlStatementContext());
-        result.getExecutionUnits().addAll(executeRewrite(sql, clonedParameters, routeContext));
+        result.getExecutionUnits().addAll(executeRewrite(sql, clonedParameters, routeContext)); // SQL改写
         if (properties.<Boolean>getValue(ConfigurationPropertyKey.SQL_SHOW)) {
             SQLLogger.logSQL(sql, properties.<Boolean>getValue(ConfigurationPropertyKey.SQL_SIMPLE), result.getSqlStatementContext(), result.getExecutionUnits());
         }
@@ -90,12 +90,12 @@ public abstract class BasePrepareEngine {
     }
     
     protected abstract List<Object> cloneParameters(List<Object> parameters);
-    
+    // SQL路由
     private RouteContext executeRoute(final String sql, final List<Object> clonedParameters) {
         registerRouteDecorator();
-        return route(router, sql, clonedParameters);
+        return route(router, sql, clonedParameters); // SQL路由
     }
-    
+    // 注册SQL路由装饰器（基于SPI的自定义扩展）
     private void registerRouteDecorator() {
         for (Class<? extends RouteDecorator> each : OrderedRegistry.getRegisteredClasses(RouteDecorator.class)) {
             RouteDecorator routeDecorator = createRouteDecorator(each);
@@ -113,12 +113,12 @@ public abstract class BasePrepareEngine {
             throw new ShardingSphereException(String.format("Can not find public default constructor for route decorator `%s`", decorator), ex);
         }
     }
-    
+    // SQL路由
     protected abstract RouteContext route(DataNodeRouter dataNodeRouter, String sql, List<Object> parameters);
-    
+    // SQL改写
     private Collection<ExecutionUnit> executeRewrite(final String sql, final List<Object> parameters, final RouteContext routeContext) {
         registerRewriteDecorator();
-        SQLRewriteContext sqlRewriteContext = rewriter.createSQLRewriteContext(sql, parameters, routeContext.getSqlStatementContext(), routeContext);
+        SQLRewriteContext sqlRewriteContext = rewriter.createSQLRewriteContext(sql, parameters, routeContext.getSqlStatementContext(), routeContext); // 创建SQL改写上下文，主要是生成对应的Token以及参数
         return routeContext.getRouteResult().getRouteUnits().isEmpty() ? rewrite(sqlRewriteContext) : rewrite(routeContext, sqlRewriteContext);
     }
     
@@ -139,13 +139,13 @@ public abstract class BasePrepareEngine {
             throw new ShardingSphereException(String.format("Can not find public default constructor for rewrite decorator `%s`", decorator), ex);
         }
     }
-    
+    // 此方法负责将 SQL 改写上下文转化为执行单元 ExecutionUnit 集合
     private Collection<ExecutionUnit> rewrite(final SQLRewriteContext sqlRewriteContext) {
-        SQLRewriteResult sqlRewriteResult = new SQLRewriteEngine().rewrite(sqlRewriteContext);
+        SQLRewriteResult sqlRewriteResult = new SQLRewriteEngine().rewrite(sqlRewriteContext); // 将 SQL 改写上下文转化为 SQL 改写结果，主要是获取改写后的 SQL 与参数
         String dataSourceName = metaData.getDataSources().getAllInstanceDataSourceNames().iterator().next();
-        return Collections.singletonList(new ExecutionUnit(dataSourceName, new SQLUnit(sqlRewriteResult.getSql(), sqlRewriteResult.getParameters())));
+        return Collections.singletonList(new ExecutionUnit(dataSourceName, new SQLUnit(sqlRewriteResult.getSql(), sqlRewriteResult.getParameters()))); // 创建 SQLUni t对象、创建 ExecutionUnit 对象，添加到集合中返回
     }
-    
+    // 通过执行了 SQLRouteRewriteEngine 对象的 rewrite 方法返回了一个 Map<RouteUnit, SQLRewriteResult> 对象，然后遍历构建了 ExecutionUnit，然后添加到集合中进行返回
     private Collection<ExecutionUnit> rewrite(final RouteContext routeContext, final SQLRewriteContext sqlRewriteContext) {
         Collection<ExecutionUnit> result = new LinkedHashSet<>();
         for (Entry<RouteUnit, SQLRewriteResult> entry : new SQLRouteRewriteEngine().rewrite(sqlRewriteContext, routeContext.getRouteResult()).entrySet()) {

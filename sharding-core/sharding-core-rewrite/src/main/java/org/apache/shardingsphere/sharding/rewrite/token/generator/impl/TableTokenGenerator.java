@@ -31,7 +31,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 
 /**
- * Table token generator.
+ * Table token generator. 表名 Token 生成器类
  */
 @Setter
 public final class TableTokenGenerator implements CollectionSQLTokenGenerator, ShardingRuleAware {
@@ -51,7 +51,7 @@ public final class TableTokenGenerator implements CollectionSQLTokenGenerator, S
     private Collection<TableToken> generateSQLTokens(final TableAvailable sqlStatementContext) {
         Collection<TableToken> result = new LinkedList<>();
         for (SimpleTableSegment each : sqlStatementContext.getAllTables()) {
-            if (shardingRule.findTableRule(each.getTableName().getIdentifier().getValue()).isPresent()) {
+            if (shardingRule.findTableRule(each.getTableName().getIdentifier().getValue()).isPresent()) { // 分片功能下，判断是数据分片规则中配置的表后，创建 TableToken 对象添加到集合中返回
                 result.add(new TableToken(each.getStartIndex(), each.getStopIndex(), each.getTableName().getIdentifier(), (SQLStatementContext) sqlStatementContext, shardingRule));
             }
         }

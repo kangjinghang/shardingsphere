@@ -29,13 +29,13 @@ import org.apache.shardingsphere.underlying.rewrite.sql.token.generator.aware.Ro
 import org.apache.shardingsphere.underlying.route.context.RouteContext;
 
 /**
- * SQL rewrite context decorator for sharding.
+ * SQL rewrite context decorator for sharding. 数据分片SQL重写装饰器
  */
 @Setter
 public final class ShardingSQLRewriteContextDecorator implements SQLRewriteContextDecorator<ShardingRule>, RouteContextAware {
     
     private RouteContext routeContext;
-    
+    // 获取参数重写器（参数化SQL才需要），然后依次对SQL重写上下文中的参数构造器 parameterBuilder 进行重写操作，分片功能下主要是自增键以及分页参数
     @SuppressWarnings("unchecked")
     @Override
     public void decorate(final ShardingRule shardingRule, final ConfigurationProperties properties, final SQLRewriteContext sqlRewriteContext) {
@@ -44,7 +44,7 @@ public final class ShardingSQLRewriteContextDecorator implements SQLRewriteConte
                 each.rewrite(sqlRewriteContext.getParameterBuilder(), sqlRewriteContext.getSqlStatementContext(), sqlRewriteContext.getParameters());
             }
         }
-        sqlRewriteContext.addSQLTokenGenerators(new ShardingTokenGenerateBuilder(shardingRule, routeContext).getSQLTokenGenerators());
+        sqlRewriteContext.addSQLTokenGenerators(new ShardingTokenGenerateBuilder(shardingRule, routeContext).getSQLTokenGenerators());  // 通过 ShardingTokenGenerateBuilder 添加分片功能下对应的Token生成器
     }
     
     @Override

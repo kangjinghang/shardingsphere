@@ -55,7 +55,7 @@ public final class SQLRewriteEntry {
     }
     
     /**
-     * Create SQL rewrite context.
+     * Create SQL rewrite context. 创建SQL改写上下文对象
      * 
      * @param sql SQL
      * @param parameters parameters
@@ -64,12 +64,12 @@ public final class SQLRewriteEntry {
      * @return SQL rewrite context
      */
     public SQLRewriteContext createSQLRewriteContext(final String sql, final List<Object> parameters, final SQLStatementContext sqlStatementContext, final RouteContext routeContext) {
-        SQLRewriteContext result = new SQLRewriteContext(schemaMetaData, sqlStatementContext, sql, parameters);
-        decorate(decorators, result, routeContext);
-        result.generateSQLTokens();
+        SQLRewriteContext result = new SQLRewriteContext(schemaMetaData, sqlStatementContext, sql, parameters); // 创建一个初始的 SQL 重写上下文 SQLRewriteContext 对象
+        decorate(decorators, result, routeContext); // 进行装饰器处理，其实就是根据Statement上下文，添加 SQLToken生成器 SQLTokenGenerator
+        result.generateSQLTokens(); // 运行各Token生成器，解构出此SQL对应的 Token
         return result;
     }
-    
+    // 依次调用注册的SQLRewriteContextDecorator实现类的decorate方法，根据配置指定的功能以及SQL的类型添加相应的SQLToken生成器
     @SuppressWarnings("unchecked")
     private void decorate(final Map<BaseRule, SQLRewriteContextDecorator> decorators, final SQLRewriteContext sqlRewriteContext, final RouteContext routeContext) {
         for (Entry<BaseRule, SQLRewriteContextDecorator> entry : decorators.entrySet()) {
